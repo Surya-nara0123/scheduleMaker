@@ -637,10 +637,6 @@ while(isEmpty_labs(lab_classes) == False and counter < 10):
     counter += 1
 theory_insert(theory_classes, timetable_classes, timetable_professors, classes_timings)
 theory_update(theory_classes, timetable_classes, timetable_professors, classes_timings)
-for i in theory_classes:
-    if theory_classes[i] != []:
-        pp.pprint(theory_classes[i])
-        pp.pprint(timetable_classes[i])
 
 verify_everything(classes_timings, timetable_classes, timetable_professors, timetable_labs, backup)
 for i,k in backup.items():
