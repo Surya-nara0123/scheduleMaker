@@ -639,6 +639,3 @@ theory_insert(theory_classes, timetable_classes, timetable_professors, classes_t
 theory_update(theory_classes, timetable_classes, timetable_professors, classes_timings)
 
 verify_everything(classes_timings, timetable_classes, timetable_professors, timetable_labs, backup)
-for i,k in backup.items():
-    if k != []:
-        pp.pprint(timetable_classes[i])
