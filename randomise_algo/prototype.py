@@ -344,9 +344,7 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
 
                 left_courses = [course[0] for course in backup[clas]]
                 if temp[0] not in left_courses:
-                    pp.pprint(backup[clas])
                     print(temp, " extra within timetable ", clas, "!! ")
-                    pp.pprint(timetable_classes[clas])
                     continue
 
                 if(len(temp) == 2):
@@ -439,15 +437,12 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
     for lab, usages in timetable_labs.items():
         if usages != []:
             for usage in usages:
-                print(usages, "==")
                 print("Unnexpected lab ", lab, " usage: ", usage)
-                pp.pprint(timetable_classes[usage[1]])
     
     for proff, lectures in timetable_professors.items():
         if lectures != []:
             for lecture in lectures:
                 print("Unnexpted lecture of ", proff, " at ", lecture)
-                pp.pprint(timetable_classes[lecture[1]])
 
 professors = ["Proff" + str(i) for i in range(0, 31)]
 labs = ["CSELAB1", "CSELAB2", "CSELAB3", "CSELAB4", "CSELAB5", "CSELAB6", "CSELAB7", "CSELAB8", "CSELAB9", "ECELAB1", "PHYLAB1"]
