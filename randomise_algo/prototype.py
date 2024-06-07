@@ -3,7 +3,6 @@ import time
 import random
 import copy
 import pprint
-pp = pprint.PrettyPrinter(indent=4)
 
 def make_random():
     current_time_ns = time.time_ns()
@@ -283,15 +282,6 @@ def theory_insert(theory_classes, timetable_classes, timetable_professors, class
                             break
 
 def theory_update(theory_classes, timetable_classes, timetable_professors, classes_timings):
-    for clas in timetable_classes.keys():             
-        for day in range(len(timetable_classes[clas])):
-            for slot in range((len(timetable_classes[clas][day]))):
-                if timetable_classes[clas][day][slot] == "":
-                    for i in theory_classes[clas]:
-                        if "Self-Learning" in i:
-                            timetable_classes[clas][day][slot] = [i[0], i[3]]
-                            break
-
     for clas in theory_classes.keys():
         if theory_classes[clas] == []:
             continue
@@ -327,15 +317,22 @@ def theory_update(theory_classes, timetable_classes, timetable_professors, class
                                 if i[1] == 0:
                                     theory_classes[clas].remove(i)
 
+    for clas in timetable_classes.keys():             
+        for day in range(len(timetable_classes[clas])):
+            for slot in range((len(timetable_classes[clas][day]))):
+                if timetable_classes[clas][day][slot] == "":
+                    for i in theory_classes[clas]:
+                        if "Self-Learning" in i:
+                            timetable_classes[clas][day][slot] = [i[0], i[3]]
+                            break
+
 def verify_everything(classes_timings, timetable_classes, timetable_professors, timetable_labs, backup):
     for clas in timetable_classes.keys():
         for day in range(len(timetable_classes[clas])):
             self_count = 0
             for slot in range(len(timetable_classes[clas][day])):
                 if timetable_classes[clas][day][slot] == "":
-                    print("Error!!!!!! Unexpected Empty Slot in timetable for ", clas, " at (", day, slot, ")")
-                    pp.pprint(timetable_classes[clas])
-                    continue
+                    return False
                     
                 if timetable_classes[clas][day][slot] == "Lunch":
                     continue
@@ -344,14 +341,13 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
 
                 left_courses = [course[0] for course in backup[clas]]
                 if temp[0] not in left_courses:
-                    print(temp, " extra within timetable ", clas, "!! ")
-                    continue
+                    return False
 
                 if(len(temp) == 2):
                     if "Self-Learning" in temp[0]:
                         self_count += 1
                         if(self_count > 3):
-                            print("Too many self-learning classes in ", clas, " at slot (", day, slot, ")")
+                            return False
                         for course in backup[clas]:
                             if(course[0] == temp[0]):
                                 course[1] -= 1
@@ -361,7 +357,7 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
                         continue
 
                     if(check_proff(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_professors, temp[1]) == False):
-                        print("Professor ", temp[1], " doesnt have a class with ", clas, " as in timetable for course ", temp[0], " on ", day, slot)
+                        return False
                     for course in backup[clas]:
                         if(course[0] == temp[0]):
                             course[1] -= 1
@@ -373,10 +369,10 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
                 if "CSE102" in temp:
                     if "IoT" in clas:
                         if((check_lab(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_labs, temp[1]) and check_lab(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_labs, temp[2])) == False):
-                            print("Lab ", temp[1], temp[2], " is not assigned class for ", clas, " on (", day, slot, ")")
+                            return False
                         
                         if(check_proff(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_professors, temp[3]) == False):
-                            print("Professor ", temp[3], " doesnt have a class with ", clas, " as in timetable for course ", temp[0], " on ", day, slot)
+                            return False
                         
                         for course in backup[clas]:
                             if(course[0] == "CSE102"):
@@ -387,10 +383,10 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
                         continue
 
                     if((check_lab(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_labs, temp[2]) and check_lab(temp[1], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_labs, temp[3])) == False):
-                        print("Lab ", temp[2], temp[3], " is not assigned class for ", clas, " on (", day, slot, ")")
+                        return False
 
                     if((check_proff(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_professors, temp[4]) and (check_proff(temp[1], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_professors, temp[5]))) == False):
-                        print("Professor ", temp[4], temp[5], " doesnt have a class with ", clas, " as in timetable for course ", temp[0], " on ", day, slot)
+                        return False
 
                     for course in backup[clas]:
                         if(course[0] == "PHY102"):
@@ -409,10 +405,10 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
                 
                 elif "ECE" in temp[0]:
                     if(check_lab(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_labs, temp[1]) == False):
-                        print("Lab ", temp[1], " is not assigned class for ", clas, " on (", day, slot, ")")
+                        return False
                     
                     if(check_proff(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_professors, temp[2]) == False):
-                        print("Professor ", temp[2], " doesnt have a class with ", clas, " as in timetable for course ", temp[0], " on ", day, slot)
+                        return False
                     
                     for course in backup[clas]:
                         if(course[0] == temp[0]):
@@ -422,10 +418,10 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
                             break
                 else:
                     if((check_lab(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_labs, temp[1]) and check_lab(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_labs, temp[2])) == False):
-                        print("Lab ", temp[1], temp[2], " is not assigned class for ", clas, " on (", day, slot, ")")
+                        return False
                     
                     if(check_proff(temp[0], clas, [classes_timings[clas[:3]][slot][0], classes_timings[clas[:3]][slot][1], day], timetable_professors, temp[3]) == False):
-                        print("Professor ", temp[3], " doesnt have a class with ", clas, " as in timetable for course ", temp[0], " on ", day, slot)
+                        return False
                     
                     for course in backup[clas]:
                         if(course[0] == temp[0]):
@@ -437,12 +433,14 @@ def verify_everything(classes_timings, timetable_classes, timetable_professors, 
     for lab, usages in timetable_labs.items():
         if usages != []:
             for usage in usages:
-                print("Unnexpected lab ", lab, " usage: ", usage)
+                return False
     
     for proff, lectures in timetable_professors.items():
         if lectures != []:
             for lecture in lectures:
-                print("Unnexpted lecture of ", proff, " at ", lecture)
+                return False
+    
+    return True
 
 professors = ["Proff" + str(i) for i in range(0, 31)]
 labs = ["CSELAB1", "CSELAB2", "CSELAB3", "CSELAB4", "CSELAB5", "CSELAB6", "CSELAB7", "CSELAB8", "CSELAB9", "ECELAB1", "PHYLAB1"]
@@ -595,47 +593,51 @@ for clas, courses in backup.items():
     for course in courses:
         if course[0] == "PHY102" or (course[0] == "CSE102" and "IoT" not in clas):
             class_courses[clas].append(course)
-backup = copy.deepcopy(class_courses)
 
-lab_classes = {clas: [course for course in courses if course[2] == "L"] for clas, courses in class_courses.items()}
-theory_classes = {clas: [course for course in courses if course[2] == "T"] for clas, courses in class_courses.items()}
+check = False
+while(check == False):
+    class_courses_1 = copy.deepcopy(class_courses)
+    class_courses_2 = copy.deepcopy(class_courses)
+    lab_classes = {clas: [course for course in courses if course[2] == "L"] for clas, courses in class_courses_1.items()}
+    theory_classes = {clas: [course for course in courses if course[2] == "T"] for clas, courses in class_courses_1.items()}
 
-courses_to_labs = {}
-for i,j in zip(lab_classes.keys(), lab_classes.values()):
-    for k in j:
-        if k[2] == "L":
-            if k[0] not in courses_to_labs.keys():
-                courses_to_labs[k[0]] = [x for x in labs if k[0][0:3] == x[0:3]]
+    courses_to_labs = {}
+    for i,j in zip(lab_classes.keys(), lab_classes.values()):
+        for k in j:
+            if k[2] == "L":
+                if k[0] not in courses_to_labs.keys():
+                    courses_to_labs[k[0]] = [x for x in labs if k[0][0:3] == x[0:3]]
 
-professor_courses = {prof: [] for prof in professors}
-for clas, courses in class_courses.items():
-    for course in courses:
-        course_code, hours, course_type, professor = course
-        professor_courses[professor].append([course_code, clas, hours])
+    timetable_professors = {proff: [] for proff in professors}
+    timetable_classes = {clas: [] for clas in class_courses_1}
+    timetable_labs = {lab: [] for lab in labs}
 
-timetable_professors = {proff: [] for proff in professors}
-timetable_classes = {clas: [] for clas in class_courses}
-timetable_labs = {lab: [] for lab in labs}
+    classes_timings = {
+        "1st" : [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "C"]],
+        "2nd" : [[810, 900, "C"], [900, 950, "C"], [950, 1040, "C"], [1040, 1150, "C"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "C"]]
+    }
 
-classes_timings = {
-    "1st" : [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "C"]],
-    "2nd" : [[810, 900, "C"], [900, 950, "C"], [950, 1040, "C"], [1040, 1150, "C"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "C"]]
-}
+    for clas, val in timetable_classes.items():
+        for i in range(0, 5):
+            val.append([])
+            for slot in classes_timings[clas[:3]]:
+                if "C" in slot[2]:
+                    val[i].append("")
+                elif "L" in slot[2]:
+                    val[i].append("Lunch")
 
-for clas, val in timetable_classes.items():
-    for i in range(0, 5):
-        val.append([])
-        for slot in classes_timings[clas[:3]]:
-            if "C" in slot[2]:
-                val[i].append("")
-            elif "L" in slot[2]:
-                val[i].append("Lunch")
+    counter = 0
+    while(isEmpty_labs(lab_classes) == False and counter < 10):
+        labs_insert(lab_classes, timetable_classes, timetable_professors, timetable_labs, classes_timings)
+        counter += 1
+    theory_insert(theory_classes, timetable_classes, timetable_professors, classes_timings)
+    theory_update(theory_classes, timetable_classes, timetable_professors, classes_timings)
 
-counter = 0
-while(isEmpty_labs(lab_classes) == False and counter < 10):
-    labs_insert(lab_classes, timetable_classes, timetable_professors, timetable_labs, classes_timings)
-    counter += 1
-theory_insert(theory_classes, timetable_classes, timetable_professors, classes_timings)
-theory_update(theory_classes, timetable_classes, timetable_professors, classes_timings)
+    proffs_tt = copy.deepcopy(timetable_professors)
+    labs_tt = copy.deepcopy(timetable_labs)
 
-verify_everything(classes_timings, timetable_classes, timetable_professors, timetable_labs, backup)
+    check = verify_everything(classes_timings, timetable_classes, timetable_professors, timetable_labs, class_courses_2)
+    if(check):
+        pprint.pprint(timetable_classes)
+        pprint.pprint(proffs_tt)
+        pprint.pprint(labs_tt)
