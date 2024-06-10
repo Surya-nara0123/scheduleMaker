@@ -20,15 +20,6 @@ function isEmptyLabs(labClasses) {
     return true;
 }
 
-function is_woman_object(target_woman) {
-    for (const parameter of Object.values(target_woman)) {
-        if (parameter == 0) {
-            return true;
-        }
-    }
-    return false;
-}
-
 function freeLabs(courseCode, timing, timetableLabs) {
     const usable = [];
     for (const lab of Object.keys(timetableLabs)) {
@@ -634,6 +625,60 @@ function verifyEverything(classesTimings, timetableClasses, timetableProfessors,
     return true
 }
 
+function format_professors(timetable_professors, classes_timings, timetable_classes) {
+    var result = {}
+    var exceptions = {}
+    var proffs = Object.keys(timetable_professors);
+    for (var _i = 0, proffs_1 = proffs; _i < proffs_1.length; _i++) {
+        let proff = proffs[_i];
+        if (timetable_professors[proff].length === 0) {
+            continue;
+        }
+        let check = true;
+        let curr = timetable_professors[proff][0][1].slice(0, 3)
+        for (const lecture of timetable_professors[proff]) {
+            if (lecture[1].slice(0, 3) != curr) {
+                check = false;
+            }
+        }
+        if (!check) {
+            exceptions[proff] = timetable_professors[proff];
+        } else {
+            result[proff] = []
+            for (let j = 0; j < 5; j++) {
+                result[proff].push([])
+                for (let slot of classes_timings[curr]) {
+                    if (slot[2].includes("C")) {
+                        result[proff][j].push("");
+                    } else if (slot[2].includes("L")) {
+                        result[proff][j].push("Lunch");
+                    }
+                }
+            }
+            for (let day = 0; day < 5; day++) {
+                for (let slot = 0; slot < result[proff][day].length; slot++) {
+                    if (result[proff][day][slot] == "Lunch") {
+                        continue
+                    }
+                    for (const lecture of timetable_professors[proff]) {
+                        if (lecture[0][0] <= classes_timings[curr][slot][0] && lecture[0][1] >= classes_timings[curr][slot][1] && lecture[0][2] === day) {
+                            result[proff][day][slot] = [lecture[1], lecture[2]]
+                            if (!(timetable_classes[lecture[1]][day][slot].length === 2)) {
+                                for (let item of timetable_classes[lecture[1]][day][slot]) {
+                                    if (item.includes("LAB")) {
+                                        result[proff][day][slot].push(item)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return [result, exceptions]
+}
+
 async function get_timetables(professors, labs, class_courses) {
     let fallback = 0;
     let classes_to_courses = JSON.parse(JSON.stringify(class_courses));
@@ -732,7 +777,8 @@ async function get_timetables(professors, labs, class_courses) {
         check = verifyEverything(classes_timings, timetable_classes, timetable_professors, timetable_labs, class_courses_2)
 
         if (check) {
-            const dicts = [timetable_classes, proffs_temp, labs_temp]
+            let proffs_dicts = format_professors(proffs_temp, classes_timings, timetable_classes);
+            const dicts = [timetable_classes, proffs_dicts[0], proffs_dicts[1], labs_temp];
             return (dicts);
         }
         fallback += 1;

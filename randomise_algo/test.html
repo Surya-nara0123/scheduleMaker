@@ -36,7 +36,8 @@
         <img id="northernblade" src="northernblade.gif" alt="Northern Blade Gif">
     </div>
     <div class="timetable" id="timetable_classes"></div>
-    <div class="timetable" id="proffs_tt"></div>
+    <div class="timetable" id="proffs_safe"></div>
+    <div class="timetable" id="proffs_exceptions"></div>
     <div class="timetable" id="labs_tt"></div>
 
     <script src="table.js"></script>
@@ -169,13 +170,15 @@
             
             try {
                 const result = await get_timetables(professors, labs, class_courses);
-                if (timetable_classes && proffs_tt && labs_tt) {
+                if (result[0] && result[1] && result[2] && result[3]) {
                     document.getElementById('timetable_classes').innerHTML = `<pre>${JSON.stringify(result[0], null, 2)}</pre>`;
-                    document.getElementById('proffs_tt').innerHTML = `<pre>${JSON.stringify(result[1], null, 2)}</pre>`;
-                    document.getElementById('labs_tt').innerHTML = `<pre>${JSON.stringify(result[2], null, 2)}</pre>`;
+                    document.getElementById('proffs_safe').innerHTML = `<pre>${JSON.stringify(result[1], null, 2)}</pre>`;
+                    document.getElementById('proffs_exceptions').innerHTML = `<pre>${JSON.stringify(result[2], null, 2)}</pre>`;
+                    document.getElementById('labs_tt').innerHTML = `<pre>${JSON.stringify(result[3], null, 2)}</pre>`;
                 } else {
                     document.getElementById('timetable_classes').innerHTML = '<pre>Undefined</pre>';
-                    document.getElementById('proffs_tt').innerHTML = '<pre>Undefined</pre>';
+                    document.getElementById('proffs_safe').innerHTML = '<pre>Undefined</pre>';
+                    document.getElementById('proffs_exceptions').innerHTML = '<pre>Undefined</pre>';
                     document.getElementById('labs_tt').innerHTML = '<pre>Undefined</pre>';
                 }
             } catch (error) {
