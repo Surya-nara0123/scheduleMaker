@@ -850,7 +850,7 @@ export default function Table() {
     generatePDF(data2);
   };
   return (  
-    <main className="min-h-screens bg-[#B4D2E7]">
+    <main className="min-h-screen bg-[#B4D2E7]">
       <div className="flex">
         <Sidebar />
         <div className="">
