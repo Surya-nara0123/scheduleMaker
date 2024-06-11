@@ -1,0 +1,49 @@
+{
+    "2st Year B.Tech CyberSecurity": [
+      [
+        "MA1002\nVV",
+        "CS1004\n SVM",
+        "b",
+        "Self-learning",
+        "Special Class",
+        "l",
+        "CS1804T\nKVA",
+        "",
+        ""
+      ],
+      [
+        "CS1008\nSBS",
+        "Self-learning/\nSpecial Class",
+        "b",
+        "CS1004\nSVM",
+        "EN1002\nCMP",
+        "l",
+        "CS1002\nAR",
+        "CS1002(T)\nAR",
+        "CS1006T\nKVA"
+      ],
+      ["EN1002\nCMP", "", "b", "", "", "l", "Mentoring", "", ""],
+      [
+        "CS1066T\nKVA",
+        "EN1002\nCMP",
+        "b",
+        "MA1002\nVV",
+        "CS1004\nSVM",
+        "l",
+        "CS1002\nAR",
+        "Self-learning/\nSpecial Class",
+        "CS1008\nSBS"
+      ],
+      [
+        "MA1002\nVV",
+        "CS1008\nSBS",
+        "b",
+        "Self-learning",
+        "CS1007\nKVA",
+        "l",
+        "",
+        "",
+        ""
+      ]
+    ]
+  }
