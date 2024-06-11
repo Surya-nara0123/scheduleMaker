@@ -33,11 +33,11 @@
     <button onclick="startProcess()">Randomize</button>
     <div id="gif-container" class="hidden">
         <h2>While you wait for the timetables, watch this Gif</h2>
-        <img id="northernblade" src="northernblade.gif" alt="Northern Blade Gif">
+        <img id="northernblade" src="balls.gif" alt="Northern Blade Gif">
     </div>
     <div class="timetable" id="timetable_classes"></div>
-    <div class="timetable" id="proffs_safe"></div>
-    <div class="timetable" id="proffs_exceptions"></div>
+    <div class="timetable" id="proffs_tt_1"></div>
+    <div class="timetable" id="proffs_tt_2"></div>
     <div class="timetable" id="labs_tt"></div>
 
     <script src="table.js"></script>
@@ -46,6 +46,39 @@
             //In final product, the professors, labs and class_courses will be made using the excel docs
             let professors = Array.from({ length: 31 }, (_, i) => "Proff" + i);
             let labs = ["CSELAB1", "CSELAB2", "CSELAB3", "CSELAB4", "CSELAB5", "CSELAB6", "CSELAB7", "CSELAB8", "CSELAB9", "ECELAB1", "PHYLAB1"];
+
+            let proff_to_short = {
+                "Proff0": "CMP",
+                "Proff1": "VGP",
+                "Proff2": "PTN",
+                "Proff3": "VSL",
+                "Proff4": "PDV",
+                "Proff5": "ANY",
+                "Proff6": "PWR",
+                "Proff7": "RJS",
+                "Proff8": "DVD",
+                "Proff9": "SMW",
+                "Proff10": "NBD",
+                "Proff11": "PRN",
+                "Proff12": "DYL",
+                "Proff13": "VSM",
+                "Proff14": "SDT",
+                "Proff15": "MRN",
+                "Proff16": "KSY",
+                "Proff17": "SNT",
+                "Proff18": "SDK",
+                "Proff19": "NGR",
+                "Proff20": "VMB",
+                "Proff21": "VDS",
+                "Proff22": "ASP",
+                "Proff23": "VRM",
+                "Proff24": "PDB",
+                "Proff25": "SJT",
+                "Proff26": "STN",
+                "Proff27": "DVS",
+                "Proff28": "DVY",
+                "Proff29": "NON"
+            };
 
             let class_courses = {
                 "1st Year B_Tech AIDS Section A": [
@@ -167,23 +200,18 @@
                     ["CSE210", 4, "L", professors[27]]    // Database Management L
                 ]
             };
-
-            let classes_timings = {
-                "1st": [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "BC"]],
-                "2nd": [[810, 900, "C"], [900, 950, "C"], [950, 1040, "BC"], [1040, 1150, "C"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "BC"]]
-            };
             
             try {
-                const result = await get_timetables(professors, labs, class_courses, classes_timings);
+                const result = await get_timetables(professors, labs, class_courses, proff_to_short);
                 if (result[0] && result[1] && result[2] && result[3]) {
                     document.getElementById('timetable_classes').innerHTML = `<pre>${JSON.stringify(result[0], null, 2)}</pre>`;
-                    document.getElementById('proffs_safe').innerHTML = `<pre>${JSON.stringify(result[1], null, 2)}</pre>`;
-                    document.getElementById('proffs_exceptions').innerHTML = `<pre>${JSON.stringify(result[2], null, 2)}</pre>`;
+                    document.getElementById('proffs_tt_1').innerHTML = `<pre>${JSON.stringify(result[1], null, 2)}</pre>`;
+                    document.getElementById('proffs_tt_2').innerHTML = `<pre>${JSON.stringify(result[2], null, 2)}</pre>`;
                     document.getElementById('labs_tt').innerHTML = `<pre>${JSON.stringify(result[3], null, 2)}</pre>`;
                 } else {
                     document.getElementById('timetable_classes').innerHTML = '<pre>Undefined</pre>';
-                    document.getElementById('proffs_safe').innerHTML = '<pre>Undefined</pre>';
-                    document.getElementById('proffs_exceptions').innerHTML = '<pre>Undefined</pre>';
+                    document.getElementById('proffs_tt_1').innerHTML = '<pre>Undefined</pre>';
+                    document.getElementById('proffs_tt_2').innerHTML = '<pre>Undefined</pre>';
                     document.getElementById('labs_tt').innerHTML = '<pre>Undefined</pre>';
                 }
             } catch (error) {
