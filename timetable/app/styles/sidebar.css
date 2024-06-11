@@ -1,0 +1,51 @@
+/* Sidebar */
+#sidebar {
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+#sidebar.expanded {
+  width: 200px;
+}
+
+#sidebar.collapsed {
+  width: 50px;
+}
+
+#sidebar .sidebar-content {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+#sidebar.collapsed .sidebar-content {
+  opacity: 1;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  text-decoration: none;
+  color: black;
+}
+
+#sidebar.collapsed .sidebar-link {
+  justify-content: center;
+}
+
+#sidebar.collapsed .sidebar-link span {
+  display: none;
+}
+
+.sidebar-link svg {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.sidebar-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
