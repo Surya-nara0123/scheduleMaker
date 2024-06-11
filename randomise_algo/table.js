@@ -11,6 +11,8 @@ function make_random() {
     return Math.floor(Math.random() * 100000000);
 }
 
+const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
 function isEmptyLabs(labClasses) {
     for (const k of Object.values(labClasses)) {
         if (k.length !== 0) {
@@ -679,7 +681,88 @@ function format_professors(timetable_professors, classes_timings, timetable_clas
     return [result, exceptions]
 }
 
-async function get_timetables(professors, labs, class_courses) {
+function add_breaks(timetable_classes, classes_timings, timetable_professors) {
+    var classes = Object.keys(timetable_classes)
+    for (var i = 0, classes_1 = classes; i < classes_1.length; i++) {
+        let clas = classes[i]
+        let curr = clas.slice(0, 3)
+        for (let day = 0; day < timetable_classes[clas].length; day++) {
+            let index = 0
+            for (let slot = 0; slot < classes_timings[curr].length; slot++) {
+                if (classes_timings[curr][slot][2] != "BC") {
+                    index += 1
+                    continue
+                }
+                if (isEqual(timetable_classes[clas][day][slot], timetable_classes[clas][day][slot - 1])) {
+                    timetable_classes[clas][day].splice(index, 0, timetable_classes[clas][day][slot]);
+                    index += 1
+                } else if (timetable_classes[clas][day][slot].length == 2) {
+                    timetable_classes[clas][day].splice(index, 0, "Break");
+                    index += 1
+                }
+                index += 1
+            }
+        }
+    }
+    var proffs = Object.keys(timetable_professors);
+    for (var i = 0, proffs_1 = proffs; i < proffs_1.length; i++) {
+        let proff = proffs[i]
+        if (timetable_professors[proff] == []) {
+            continue
+        }
+        let curr = ""
+        for (let day = 0; day < timetable_professors[proff].length; day++) {
+            for (let slot = 0; slot < timetable_professors[proff][day].length; slot++) {
+                if (curr != "") {
+                    break
+                }
+                if (timetable_professors[proff][day][slot] != "" && timetable_professors[proff][day][slot] != "Lunch") {
+                    curr = timetable_professors[proff][day][slot][0].slice(0, 3)
+                }
+            }
+        }
+        for (let day = 0; day < timetable_professors[proff].length; day++) {
+            let index = 0
+            for (let slot = 0; slot < classes_timings[curr].length; slot++) {
+                if (classes_timings[curr][slot][2] != "BC") {
+                    index += 1
+                    continue
+                } if (timetable_professors[proff][day][slot] == "") {
+                    timetable_professors[proff][day].splice(index, 0, "Break");
+                    index += 2
+                } else if (isEqual(timetable_professors[proff][day][slot], timetable_professors[proff][day][slot - 1])) {
+                    timetable_professors[proff][day].splice(index, 0, timetable_professors[proff][day][slot]);
+                    index += 2
+                } else {
+                    timetable_professors[proff][day].splice(index, 0, "Break");
+                    index += 2
+                }
+            }
+        }
+    }
+    var classes_2 = Object.keys(classes_timings)
+    for (var i = 0; i < classes_2.length; i++) {
+        let clas = classes_2[i]
+        for (let slot = 0; slot < classes_timings[clas].length; slot++) {
+            if (classes_timings[clas][slot][2] != "BC") {
+                continue
+            }
+            let length = classes_timings[clas][slot][1] - classes_timings[clas][slot][0]
+            length -= 100
+            classes_timings[clas][slot][2] = "C"
+            let new_time = classes_timings[clas][slot][0]
+            new_time += (length + 10)
+            if (new_time % 100 >= 60) {
+                new_time -= 60;
+                new_time += 100
+            }
+            classes_timings[clas][slot][0] = new_time
+            classes_timings[clas].splice(slot, 0, [classes_timings[clas][slot][0], classes_timings[clas][slot][0] + length + 10, "B"])
+        }
+    }
+}
+
+async function get_timetables(professors, labs, class_courses, classes_timings) {
     let fallback = 0;
     let classes_to_courses = JSON.parse(JSON.stringify(class_courses));
     for (let [clas, courses] of Object.entries(classes_to_courses)) {
@@ -745,11 +828,6 @@ async function get_timetables(professors, labs, class_courses) {
             timetable_labs[lab] = [];
         }
 
-        let classes_timings = {
-            "1st": [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "C"]],
-            "2nd": [[810, 900, "C"], [900, 950, "C"], [950, 1040, "C"], [1040, 1150, "C"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "C"]]
-        };
-
         for (let [clas, val] of Object.entries(timetable_classes)) {
             for (let i = 0; i < 5; i++) {
                 val.push([]);
@@ -778,6 +856,7 @@ async function get_timetables(professors, labs, class_courses) {
 
         if (check) {
             let proffs_dicts = format_professors(proffs_temp, classes_timings, timetable_classes);
+            add_breaks(timetable_classes, classes_timings, proffs_dicts[0])
             const dicts = [timetable_classes, proffs_dicts[0], proffs_dicts[1], labs_temp];
             return (dicts);
         }

@@ -167,9 +167,14 @@
                     ["CSE210", 4, "L", professors[27]]    // Database Management L
                 ]
             };
+
+            let classes_timings = {
+                "1st": [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "BC"]],
+                "2nd": [[810, 900, "C"], [900, 950, "C"], [950, 1040, "BC"], [1040, 1150, "C"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "BC"]]
+            };
             
             try {
-                const result = await get_timetables(professors, labs, class_courses);
+                const result = await get_timetables(professors, labs, class_courses, classes_timings);
                 if (result[0] && result[1] && result[2] && result[3]) {
                     document.getElementById('timetable_classes').innerHTML = `<pre>${JSON.stringify(result[0], null, 2)}</pre>`;
                     document.getElementById('proffs_safe').innerHTML = `<pre>${JSON.stringify(result[1], null, 2)}</pre>`;
