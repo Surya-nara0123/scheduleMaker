@@ -9,7 +9,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#B4D2E7]">
         <div className="flex">
             <Sidebar />
-            <div className="">
+            <div className=" ml-12">
                 <div className="mt-16 font-semibold ml-12 text-4xl">
                     Home
                     <div className="bg-white h-0.5 w-1/2 mt-1"></div>

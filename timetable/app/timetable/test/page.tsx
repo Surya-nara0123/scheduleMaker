@@ -4,115 +4,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 import Sidebar from "../../Components/Sidebar";
 import SVGStar from "../../Components/star";
-const data = {
-  "2st Year B.Tech CyberSecurity": [
-    [
-      "MA1002\nVV",
-      "CS1004\n SVM",
-      "b",
-      "Self-learning",
-      "Special Class",
-      "l",
-      "CS1804T\nKVA",
-      "",
-      ""
-    ],
-    [
-      "CS1008\nSBS",
-      "Self-learning/\nSpecial Class",
-      "b",
-      "CS1004\nSVM",
-      "EN1002\nCMP",
-      "l",
-      "CS1002\nAR",
-      "CS1002(T)\nAR",
-      "CS1006T\nKVA"
-    ],
-    ["EN1002\nCMP", "", "b", "", "", "l", "Mentoring", "", ""],
-    [
-      "CS1066T\nKVA",
-      "EN1002\nCMP",
-      "b",
-      "MA1002\nVV",
-      "CS1004\nSVM",
-      "l",
-      "CS1002\nAR",
-      "Self-learning/\nSpecial Class",
-      "CS1008\nSBS"
-    ],
-    [
-      "MA1002\nVV",
-      "CS1008\nSBS",
-      "b",
-      "Self-learning",
-      "CS1007\nKVA",
-      "l",
-      "",
-      "",
-      ""
-    ]
-  ],
-  "2st Year B.Tech AI/DS A": [
-    [
-      "MA1002\nVV",
-      "CS1004\n SVM",
-      "b",
-      "Self-learning",
-      "Special Class",
-      "l",
-      "CS1804T\nKVA",
-      "",
-      ""
-    ],
-    [
-      "CS1008\nSBS",
-      "Self-learning/\nSpecial Class",
-      "b",
-      "CS1004\nSVM",
-      "EN1002\nCMP",
-      "l",
-      "CS1002\nAR",
-      "CS1002(T)\nAR",
-      "CS1006T\nKVA"
-    ],
-    ["EN1002\nCMP", "", "b", "", "", "l", "Mentoring", "", ""],
-    [
-      "CS1066T\nKVA",
-      "EN1002\nCMP",
-      "b",
-      "MA1002\nVV",
-      "CS1004\nSVM",
-      "l",
-      "CS1002\nAR",
-      "Self-learning/\nSpecial Class",
-      "CS1008\nSBS"
-    ],
-    [
-      "MA1002\nVV",
-      "CS1008\nSBS",
-      "b",
-      "Self-learning",
-      "CS1007\nKVA",
-      "l",
-      "",
-      "",
-      ""
-    ]]
-};
 export default function Table() {
-  const [year, setYear] = useState("");
-  const [section, setSection] = useState("");
   const [year1, setYear1] = useState(["8.10-9.00", "9.00-9.50", "break", "10.10-11.00", "11.00-11.50","Lunch", "12.50-1.40", "1.40-2.30", "break", "2.40-3.30"]);
-
-  const generateTimeTable = () => {
-    if (year == "1st"){
-      setYear1(["8.10-9.00", "9.00-9.50", "break", "10.10-11.00", "11.00-11.50","Lunch", "12.50-1.40", "1.40-2.30", "break", "2.40-3.30"]);
-    } else {
-      setYear1(["8.10-9.00", "9.00-9.50", "9.50-10.40", "10.40-11.30","Lunch", "12.50-1.40", "1.40-2.30", "break", "2.40-3.30"]);
-    }
-    console.log(data);
-    console.log(year, section);
-  };
   return (
     <main className="min-h-screen bg-[#B4D2E7]">
       <div className="flex">
@@ -123,32 +16,6 @@ export default function Table() {
             <div className="bg-white h-0.5 w-1/2 mt-1"></div>
           </div>
           <div className="m-5 items-center justify-center p-3 ml-10">
-            <select
-              className="bg-white rounded-lg p-2 mr-2"
-              onChange={(e) => {
-                setYear(e.target.value);
-              }}
-            >
-              <option defaultChecked>Select year</option>
-              <option>1st</option>
-              <option>2nd</option>
-            </select>
-            <select
-              className="bg-white rounded-lg p-2 mr-2"
-              onChange={(e) => {
-                setSection(e.target.value);
-              }}
-            >
-              <option defaultChecked>Select section</option>
-              <option>2st Year B.Tech CyberSecurity</option>
-              <option>2st Year B.Tech AI/DS A</option>
-              <option>AI/DS B</option>
-              <option>AI/DS C</option>
-              <option>IoT A</option>
-              <option>IoT B</option>
-              <option>Bcom PA</option>
-              <option>Bcom</option>
-            </select>
             <button className="bg-green-500 justfiy-center items-center rounded-lg p-2" onClick={generateTimeTable}>
               Generate timetable
             </button>
