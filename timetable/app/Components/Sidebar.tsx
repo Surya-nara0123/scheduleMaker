@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import "../styles/sidebar.css";
 
 const Sidebar = () => {
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
@@ -25,7 +25,7 @@ const Sidebar = () => {
   }
 
   return (
-    <main className="min-h-screen bg-[#B4D2E7] fixed">
+    <main className="min-h-screen bg-[#B4D2E7] absolute">
       <div className="">
         <div
           id="sidebar"
