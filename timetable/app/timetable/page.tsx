@@ -848,13 +848,8 @@ export default function Table() {
     // console.log();
     // console.log(data2);
     let temp = {"1st Year B_Tech IoT Section A":data["1st Year B_Tech IoT Section A"]}
-<<<<<<< Updated upstream
     console.log(temp);
     generatePDF(data);
-=======
-    // console.log(temp);
-    // generatePDF(data2);
->>>>>>> Stashed changes
   };
   return (  
     <main className="min-h-screen bg-[#B4D2E7]">
