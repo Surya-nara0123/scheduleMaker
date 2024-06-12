@@ -379,10 +379,6 @@ export async function generatePDF(timetableData) {
     { align: "left" }
   );
 
-  // Convert the PDF to a Blob and create an object URL
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-
-  // Embed the PDF in the webpage
-  PDFObject.embed(pdfUrl, "#pdfViewer");
+  //save the pdf
+  doc.save(`${Object.keys(timetableData)[0]}.pdf`)
 }
