@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import SVGStar from "../Components/star";
 import { generatePDF } from "./print.jsx";
+import { startProcess } from "./algo.jsx";
 const data = {
   "1st Year B_Tech AIDS Section A": [
     [
@@ -843,11 +844,17 @@ export default function Table() {
     console.log(year, section);
   };
   const genPDF = () => {
-    console.log();
-    console.log(data2);
+    startProcess();
+    // console.log();
+    // console.log(data2);
     let temp = {"1st Year B_Tech IoT Section A":data["1st Year B_Tech IoT Section A"]}
+<<<<<<< Updated upstream
     console.log(temp);
     generatePDF(data);
+=======
+    // console.log(temp);
+    // generatePDF(data2);
+>>>>>>> Stashed changes
   };
   return (  
     <main className="min-h-screen bg-[#B4D2E7]">
@@ -929,7 +936,7 @@ export default function Table() {
                   <>
                     {Array.from({ length: 5 }).map((_, rowIndex) => (
                       <div
-                        key={colIndex}
+                        key={colIndex+rowIndex}
                         className="w-24 h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[10px]"
                       >
                         {data["2nd Year B_Tech AIDS Section A"][rowIndex][
