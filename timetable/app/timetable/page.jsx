@@ -39,12 +39,6 @@ export default function Table() {
           <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
           <div className="bg-white h-0.5 w-1/2 mt-1 ml-12"></div>
           <div className="m-5 items-center justify-center p-3 ml-10">
-            <button
-              className="bg-green-500 justify-center items-center rounded-lg p-2"
-              onClick={printOutput}
-            >
-              Generate timetable
-            </button>
           </div>
           {Object.keys(timetableData).map((dataa, index) => (
             <div className="mt-12 ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
