@@ -768,7 +768,12 @@ function convert_to_string(timetable_classes, proff_to_short, timetable_professo
                     if (is_proff(timetable_classes[clas][day][slot][j])) {
                         result += proff_to_short[timetable_classes[clas][day][slot][j]]
                     } else {
+                        if (timetable_classes[clas][day][slot][j].includes("Self-Learning")) {
+                            result += "Self-Learning"
+                        }
+                        else{
                         result += timetable_classes[clas][day][slot][j]
+                        }
                     }
                     result += " "
                 }
@@ -1067,11 +1072,13 @@ async function randomize() {
     try {
         const result = await get_timetables(professors, labs, class_courses, proff_to_short);
         console.log(result[0])
+        return result[0]
     } catch (error) {
         console.error('Error generating timetables:', error);
     }
 }
 
-export function startProcess() {
-        randomize();
+export async function  startProcess() {
+    let a = await randomize();
+    return a;
 }
