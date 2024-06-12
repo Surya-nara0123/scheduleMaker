@@ -1,7 +1,6 @@
 import jsPDF from "jspdf";
 export async function generatePDF(timetableData) {
   let id;
-  const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "cm",
