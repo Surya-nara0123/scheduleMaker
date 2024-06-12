@@ -848,7 +848,7 @@ export default function Table() {
     let a = await startProcess();
     setTimetableData(a);
   };
-  const genPDF = (classTitle : string) => {
+  const genPDF = (classTitle) => {
     // startProcess();
     console.log(classTitle);
     // console.log(data2);
