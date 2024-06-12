@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 export async function generatePDF(timetableData) {
   let id;
+  const { jsPDF } = window.jspdf;
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "cm",
@@ -219,8 +220,8 @@ export async function generatePDF(timetableData) {
       const day = timeTable[i];
       let a = 0;
       for (let j = 0; j < day.length; j++) {
-        const subject = day[j];
-        if (subject == "b" || subject == "l") continue;
+        let subject = day[j];
+        if (j == 2 || j == 5 || j == 8) continue;
         doc.setFillColor(221, 229, 255);
         doc.rect(
           tablePosition[id - 1][i][a][0],
@@ -229,6 +230,10 @@ export async function generatePDF(timetableData) {
           1,
           "DF"
         );
+        if (subject.search(" T ") != -1) {
+          subject = subject.replaceAll(" T ", "(T) ");
+        }
+        subject = subject.replaceAll(" ", "\n");
         doc.text(
           subject,
           tablePosition[id - 1][i][a][0] + 1,
@@ -260,7 +265,7 @@ export async function generatePDF(timetableData) {
       let a = 0;
       for (let j = 0; j < day.length; j++) {
         const subject = day[j];
-        if (subject == "b" || subject == "l") continue;
+        if (j == 2 || j == 5 || j == 8) continue;
         doc.setFillColor(221, 229, 255);
         doc.rect(
           tablePosition[id - 1][i][a][0],
@@ -375,61 +380,10 @@ export async function generatePDF(timetableData) {
     { align: "left" }
   );
 
-  // Save the PDF
-  doc.save("timetable.pdf");
-  // // Convert the PDF to a Blob and create an object URL
-  // const pdfBlob = doc.output("blob");
-  // const pdfUrl = URL.createObjectURL(pdfBlob);
+  // Convert the PDF to a Blob and create an object URL
+  const pdfBlob = doc.output("blob");
+  const pdfUrl = URL.createObjectURL(pdfBlob);
 
-  // // Embed the PDF in the webpage
-  // PDFObject.embed(pdfUrl, "#pdfViewer");
+  // Embed the PDF in the webpage
+  PDFObject.embed(pdfUrl, "#pdfViewer");
 }
-let timetableData = {
-  "2st Year B.Tech CyberSecurity": [
-    [
-      "MA1002\nVV",
-      "CS1004\n SVM",
-      "b",
-      "Self-learning",
-      "Special Class",
-      "l",
-      "CS1804T\nKVA",
-      "",
-      "",
-    ],
-    [
-      "CS1008\nSBS",
-      "Self-learning/\nSpecial Class",
-      "b",
-      "CS1004\nSVM",
-      "EN1002\nCMP",
-      "l",
-      "CS1002\nAR",
-      "CS1002(T)\nAR",
-      "CS1006T\nKVA",
-    ],
-    ["EN1002\nCMP", "", "b", "", "", "l", "Mentoring", "", ""],
-    [
-      "CS1066T\nKVA",
-      "EN1002\nCMP",
-      "b",
-      "MA1002\nVV",
-      "CS1004\nSVM",
-      "l",
-      "CS1002\nAR",
-      "Self-learning/\nSpecial Class",
-      "CS1008\nSBS",
-    ],
-    [
-      "MA1002\nVV",
-      "CS1008\nSBS",
-      "b",
-      "Self-learning",
-      "CS1007\nKVA",
-      "l",
-      "",
-      "",
-      "",
-    ],
-  ],
-};
