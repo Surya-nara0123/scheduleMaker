@@ -693,13 +693,8 @@ function add_breaks(timetable_classes, classes_timings, timetable_professors) {
                     index += 1
                     continue
                 }
-                if (isEqual(timetable_classes[clas][day][slot], timetable_classes[clas][day][slot - 1])) {
-                    timetable_classes[clas][day].splice(index, 0, timetable_classes[clas][day][slot]);
-                    index += 1
-                } else if (timetable_classes[clas][day][slot].length == 2) {
-                    timetable_classes[clas][day].splice(index, 0, "Break");
-                    index += 1
-                }
+                timetable_classes[clas][day].splice(index, 0, "Break");
+                index += 1
                 index += 1
             }
         }
@@ -727,16 +722,9 @@ function add_breaks(timetable_classes, classes_timings, timetable_professors) {
                 if (classes_timings[curr][slot][2] != "BC") {
                     index += 1
                     continue
-                } if (timetable_professors[proff][day][slot] == "") {
-                    timetable_professors[proff][day].splice(index, 0, "Break");
-                    index += 2
-                } else if (isEqual(timetable_professors[proff][day][slot], timetable_professors[proff][day][slot - 1])) {
-                    timetable_professors[proff][day].splice(index, 0, timetable_professors[proff][day][slot]);
-                    index += 2
-                } else {
-                    timetable_professors[proff][day].splice(index, 0, "Break");
-                    index += 2
                 }
+                timetable_professors[proff][day].splice(index, 0, "Break");
+                index += 2
             }
         }
     }
