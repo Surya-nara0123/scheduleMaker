@@ -7,6 +7,9 @@ import SVGStar from "../Components/star";
 import { generatePDF } from "./print.jsx";
 import { startProcess } from "./algo.jsx";
 import Papa from "papaparse";
+import PocketBase from "pocketbase";
+
+const pb = new PocketBase("https://snuc.pockethost.io");
 
 export default function Table() {
   const year1 = [
@@ -193,10 +196,103 @@ export default function Table() {
     }
   };
 
-  const genPDF = (classTitle) => {
+  const convertDetails = async(data) => {
+    let index = 0;
+      const processFiles = [file1, file2, file3, file4];
+      let done_files = [];
+      let results = [];
+      for (const file of processFiles) {
+        let file_name = file.name;
+        if (done_files.includes(file_name)) {
+          alert("Repeating Files!!");
+          return;
+        } else {
+          done_files.push(file_name);
+        }
+        const result = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const text = e.target.result;
+            Papa.parse(text, {
+              header: false,
+              skipEmptyLines: true,
+              complete: function (results) {
+                const data = results.data;
+                let dictionary = {};
+                if (index === 0) {
+                  dictionary = createDictionary_class(data);
+                } else if (index === 1) {
+                  dictionary = createList_labs(data);
+                } else if (index === 2) {
+                  dictionary = createList_proffs(data);
+                } else {
+                  dictionary = creatDictionary_proff(data);
+                }
+                resolve(dictionary);
+              },
+            });
+          };
+          reader.readAsText(file);
+        });
+        if ((Array.isArray(result) && result.length === 0) || result == {}) {
+          alert("Improper File = " + file_name);
+          return;
+        }
+        results.push(result);
+        index += 1;
+      }
+      let class_courses = {};
+      let professors = [];
+      let proffs_names_to_short = {};
+      let labs = [];
+
+      for (const index in results) {
+        let thing = results[index];
+        if (typeof thing === "object" && !Array.isArray(thing)) {
+          let keys = Object.keys(thing);
+          if (keys[0].includes("Year")) {
+            class_courses = JSON.parse(JSON.stringify(thing));
+          } else {
+            proffs_names_to_short = JSON.parse(JSON.stringify(thing));
+          }
+        } else if (Array.isArray(thing)) {
+          if (thing[0].includes("LAB")) {
+            labs = JSON.parse(JSON.stringify(thing));
+          } else {
+            professors = JSON.parse(JSON.stringify(thing));
+          }
+        }
+      }
+      let course = class_courses[data];
+      let profs = professors;
+
+      let proffDetails = [];
+      for(let i=0;i<course.length;i++){
+        let temp = {}
+        temp[course[i][0]] = [
+          course[i][0], course[i][3], proffs_names_to_short[course[i][3]], "HS", 3
+        ]
+        proffDetails.push(
+            temp,
+        )
+      }
+      console.log(proffDetails);
+      return proffDetails;
+  };
+
+  const genPDF = async (classTitle) => {
     let temp = {};
+    let a = await convertDetails(classTitle);
     temp[classTitle] = timetableData[classTitle];
-    generatePDF(temp);
+    await generatePDF(temp, a);
+  };
+  const saveTimeTable = async () => {
+    console.log(timetableData);
+    const data = {
+      timetable: timetableData,
+    };
+
+    const record = await pb.collection('timetable').update("wizw6h9iga918ub", data);
   };
 
   return (
@@ -256,7 +352,15 @@ export default function Table() {
                 className="bg-blue-500 justify-center items-center rounded-lg p-2 ml-2"
                 onClick={printOutput}
               >
-                Download All Timetables
+                Save All Timetables
+              </button>
+              <button
+                className="bg-gray-500 justify-center items-center rounded-lg p-2 ml-2"
+                onClick={() => {
+                  saveTimeTable();
+                }}
+              >
+                Push to DB
               </button>
             </div>
           </div>
@@ -351,7 +455,7 @@ export default function Table() {
                   genPDF(dataa);
                 }}
               >
-                PRINT
+                Save
               </button>
             </div>
           ))}

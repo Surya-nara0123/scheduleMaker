@@ -4,17 +4,21 @@ import { useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import snu02 from "../Components/snu-02.jpg";
 import Image from "next/image";
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css";
 
 const pb = new pocketbase("https://snuc.pockethost.io");
 
 function Login() {
   const handleLogin = async () => {
-    const record = await pb
-      .collection("users")
-      .getFirstListItem('username="Frenzy"', {
-        expand: "relField1,relField2.subRelField",
-      });
-    console.log(record);
+    try {
+      const record = await pb.collection("users").authWithPassword(user.email, user.password)
+      console.log(record);
+      window.location.href = "/timetable";
+    } catch (e) {
+      // toast.error("Invalid credentials")
+      alert("Invalid credentials")
+    }
   };
   const [user, setUser] = useState({ email: "", password: "" });
   return (

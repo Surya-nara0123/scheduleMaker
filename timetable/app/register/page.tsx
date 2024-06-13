@@ -20,7 +20,12 @@ function RegistrationPage() {
       passwordConfirm: password,
       name: namee,
     };
-    const record = await pb.collection("users").create(data);
+    try {
+      const record = await pb.collection("users").create(data);
+      window.location.href = "/timetable";
+    } catch (e) {
+      console.log(e);
+    }
   };
   const [user, setUser] = useState({
     username: "",

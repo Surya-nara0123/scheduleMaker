@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-export async function generatePDF(timetableData) {
+export async function generatePDF(timetableData, faculty) {
   let id;
   const doc = new jsPDF({
     orientation: "landscape",
@@ -328,49 +328,7 @@ export async function generatePDF(timetableData) {
     }
   }
   // table of faculty
-  const faculty = [
-    {
-      EN1002: [
-        "English for Engineers",
-        "Dr.Cherry Mathews Philipose",
-        "CMP",
-        "HS",
-        3,
-      ],
-    },
-    {
-      MA1002: ["Probability and Statistics", "Dr.Vembarasen", "VV", "BS", 3],
-    },
-    {
-      CS1002: [
-        "Programming in Python",
-        "Dr.Anushya Racheal GladSon",
-        "AR",
-        "ES",
-        2,
-      ],
-    },
-    {
-      CS1006T: ["Data Structures", "Dr.Kandappan V", "KVA", "PC", 3],
-    },
-    {
-      CS1004: [
-        "Computer Organization and Architecture",
-        "Dr.Vegesna ",
-        "SVM",
-        "ES",
-        3,
-      ],
-    },
-    {
-      CS1006T: ["Classical Cryptography", "Dr.Subim Sahayam B", "SBS", "ES", 3],
-    },
-    {
-      CS1804T: ["Data Structures Lab", "Dr.Kandappan V", "KVA", "PC", 2],
-    },
-    { CS1802: ["Cyber Security", "Dr.Amsaprabhaa M", "AM", "ES", 2] },
-  ];
-
+  console.log(faculty);
   doc.setFontSize(6);
   doc.setFont("Helvetica", "bold");
   doc.text("Course Code", 4.65, 9.825 - 0.6, { align: "center" });
@@ -386,12 +344,12 @@ export async function generatePDF(timetableData) {
     const key = Object.keys(course)[0];
     const value = course[key];
     doc.text(key, 4.65, 9.6 + i * 0.5, { align: "center" });
-    doc.text(value[0], 4.65 + 1, 9.6 + i * 0.5, { align: "left" });
-    doc.text(value[1], 4.65 + 3 + 2, 9.6 + i * 0.5, { align: "left" });
-    doc.text(value[2], 4.65 + 6.4 + 2, 9.6 + i * 0.5, {
+    doc.text(`${value[0]}`, 4.65 + 1, 9.6 + i * 0.5, { align: "left" });
+    doc.text(`${value[1]}`, 4.65 + 3 + 2, 9.6 + i * 0.5, { align: "left" });
+    doc.text(`${value[2]}`, 4.65 + 6.4 + 2, 9.6 + i * 0.5, {
       align: "center",
     });
-    doc.text(value[3], 4.65 + 8.4 + 1, 9.6 + i * 0.5, {
+    doc.text(`${value[3]}`, 4.65 + 8.4 + 1, 9.6 + i * 0.5, {
       align: "center",
     });
     doc.text(`${value[4]}`, 4.65 + 9.4 + 1, 9.6 + i * 0.5, {

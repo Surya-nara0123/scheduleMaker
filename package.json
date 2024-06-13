@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "papaparse": "^5.4.1",
-    "pocketbase": "^0.21.3"
+    "pocketbase": "^0.21.3",
+    "react-toastify": "^10.0.5"
   }
 }
