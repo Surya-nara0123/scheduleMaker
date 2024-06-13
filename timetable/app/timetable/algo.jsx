@@ -910,44 +910,7 @@ async function get_timetables(professors, labs, class_courses, proff_to_short) {
     return {};
 }
 
-async function randomize(class_courses) {
-    //In final product, the professors, labs and class_courses will be made using the excel docs
-    let professors = Array.from({ length: 31 }, (_, i) => "Proff" + i);
-    let labs = ["CSELAB1", "CSELAB2", "CSELAB3", "CSELAB4", "CSELAB5", "CSELAB6", "CSELAB7", "CSELAB8", "CSELAB9", "ECELAB1", "PHYLAB1"];
-
-    let proff_to_short = {
-        "Proff0": "CMP",
-        "Proff1": "VGP",
-        "Proff2": "PTN",
-        "Proff3": "VSL",
-        "Proff4": "PDV",
-        "Proff5": "ANY",
-        "Proff6": "PWR",
-        "Proff7": "RJS",
-        "Proff8": "DVD",
-        "Proff9": "SMW",
-        "Proff10": "NBD",
-        "Proff11": "PRN",
-        "Proff12": "DYL",
-        "Proff13": "VSM",
-        "Proff14": "SDT",
-        "Proff15": "MRN",
-        "Proff16": "KSY",
-        "Proff17": "SNT",
-        "Proff18": "SDK",
-        "Proff19": "NGR",
-        "Proff20": "VMB",
-        "Proff21": "VDS",
-        "Proff22": "ASP",
-        "Proff23": "VRM",
-        "Proff24": "PDB",
-        "Proff25": "SJT",
-        "Proff26": "STN",
-        "Proff27": "DVS",
-        "Proff28": "DVY",
-        "Proff29": "NON"
-    };
-    
+async function randomize(class_courses, professors, proff_to_short, labs) {
     try {
         const result = await get_timetables(professors, labs, class_courses, proff_to_short);
         return result[0]
@@ -956,7 +919,7 @@ async function randomize(class_courses) {
     }
 }
 
-export async function  startProcess(class_courses) {
-    let b = await randomize(class_courses);
+export async function  startProcess(class_courses, professors, proff_to_short, labs) {
+    let b = await randomize(class_courses, professors, proff_to_short, labs);
     return b;
 }

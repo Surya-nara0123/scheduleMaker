@@ -31,7 +31,7 @@ export default function Table() {
     setFile(e.target.files[0]);
   };
 
-  const createDictionary = (data) => {
+  const createDictionary_class = (data) => {
     const dictionary = {};
     let currentSection = '';
 
@@ -50,17 +50,37 @@ export default function Table() {
     return dictionary;
   };
 
+  const createList_labs = (data) => {
+    const labs = [];
+    data.forEach(row => {
+      labs.push(row[0])
+    })
+    return labs;
+  }
+
+  const creatDictionary_proff = (data) => {
+    const proffs_to_short = {}
+    data.forEach(row => {
+      proffs_to_short[row[0]] = row[1]
+    })
+    return proffs_to_short;
+  }
+
+  const createList_proffs = (data) => {
+    const proffs_names = []
+    data.forEach(row => {
+      proffs_names.push(row[0]);
+    })
+    return proffs_names;
+  }
+
   const printOutput = async () => {
     if (file1 && file2 && file3 && file4) {
-      const dictionaries = [];
 
       const processFiles = [file1, file2, file3, file4];
-      let results = [];
+      let results = []
       for (const file of processFiles) {
-        console.log(file.name);
-        if (file.name != "class_courses.csv") {
-          continue;
-        }
+        let file_name = file.name
         const result = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = function (e) {
@@ -70,7 +90,16 @@ export default function Table() {
               skipEmptyLines: true,
               complete: function (results) {
                 const data = results.data;
-                const dictionary = createDictionary(data);
+                let dictionary = {}
+                if (file_name.includes("class")) {
+                  dictionary = createDictionary_class(data);
+                } else if (file_name.includes("lab")) {
+                  dictionary = createList_labs(data);
+                } else if (file_name.includes("names")) {
+                  dictionary = createList_proffs(data);
+                } else {
+                  dictionary = creatDictionary_proff(data);
+                }
                 resolve(dictionary);
               }
             });
@@ -79,8 +108,30 @@ export default function Table() {
         });
         results.push(result);
       }
-      console.log(results);
-      let a = await startProcess(results[0]);
+      let class_courses = {};
+      let professors = [];
+      let proffs_names_to_short = {};
+      let labs = [];
+
+      for (const index in results) {
+        let thing = results[index];
+
+        if (typeof thing === 'object' && !Array.isArray(thing)) {
+          let keys = Object.keys(thing);
+          if (keys[0].includes("Year")) {
+            class_courses = JSON.parse(JSON.stringify(thing));
+          } else {
+            proffs_names_to_short = JSON.parse(JSON.stringify(thing));
+          }
+        } else if (Array.isArray(thing)) {
+          if (thing[0].includes("LAB")) {
+            labs = JSON.parse(JSON.stringify(thing));
+          } else {
+            professors = JSON.parse(JSON.stringify(thing));
+          }
+        }
+      }
+      let a = await startProcess(class_courses, professors, proffs_names_to_short, labs);
       setTimetableData(a);
     } else {
       alert("Please upload all 4 CSV files.");
@@ -101,33 +152,33 @@ export default function Table() {
           <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
           <div className="bg-white h-0.5 w-1/2 mt-1 ml-12"></div>
           <div className="m-5 items-center justify-center p-3 ml-10">
-          <div className="mt-8">
-            <input
-            className="rounded-lg p-2"
-              type="file"
-              accept=".csv"
-              onChange={(e) => handleFileChange(e, setFile1)}
-            />
-            <input
-            className="rounded-lg p-2"
-              type="file"
-              accept=".csv"
-              onChange={(e) => handleFileChange(e, setFile2)}
-            />
-            <input
-            className="rounded-lg p-2"
-              type="file"
-              accept=".csv"
-              onChange={(e) => handleFileChange(e, setFile3)}
-            />
-            <input
-            className="rounded-lg p-2"
-              type="file"
-              accept=".csv"
-              onChange={(e) => handleFileChange(e, setFile4)}
-            />
-          </div>
-          <button className="bg-green-500 justify-center items-center rounded-lg p-2" onClick={printOutput}>Generate Timetable</button>
+            <div className="mt-8">
+              <input
+                className="rounded-lg p-2"
+                type="file"
+                accept=".csv"
+                onChange={(e) => handleFileChange(e, setFile1)}
+              />
+              <input
+                className="rounded-lg p-2"
+                type="file"
+                accept=".csv"
+                onChange={(e) => handleFileChange(e, setFile2)}
+              />
+              <input
+                className="rounded-lg p-2"
+                type="file"
+                accept=".csv"
+                onChange={(e) => handleFileChange(e, setFile3)}
+              />
+              <input
+                className="rounded-lg p-2"
+                type="file"
+                accept=".csv"
+                onChange={(e) => handleFileChange(e, setFile4)}
+              />
+            </div>
+            <button className="bg-green-500 justify-center items-center rounded-lg p-2" onClick={printOutput}>Generate Timetable</button>
           </div>
           {Object.keys(timetableData).map((dataa, index) => (
             <div className="mt-12 ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
@@ -142,14 +193,14 @@ export default function Table() {
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  { index <= 5 ? year1.map((slot, index) => (
+                  {index <= 5 ? year1.map((slot, index) => (
                     <div
                       key={index}
                       className="w-24 h-16 flex items-center justify-center bg-[#bfc0c0] rounded-lg "
                     >
                       {slot}
                     </div>
-                  )): [
+                  )) : [
                     "8.10-9.00",
                     "9.00-9.50",
                     "9.50-10.40",
@@ -190,7 +241,7 @@ export default function Table() {
                           className="w-24 h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[10px]"
                         >
                           {timetableData[dataa][rowIndex][colIndex] != "b" &&
-                          timetableData[dataa][rowIndex][colIndex] != "l" ? (
+                            timetableData[dataa][rowIndex][colIndex] != "l" ? (
                             <div className="text-center w-full h-full items-center justify-center flex font-bold">
                               {timetableData[dataa][rowIndex][colIndex]}
                             </div>
