@@ -34,43 +34,71 @@ export default function Table() {
   const createDictionary_class = (data) => {
     const dictionary = {};
     let currentSection = '';
+    let check = true;
 
     data.forEach(row => {
       if (row.length === 1) {
         currentSection = row[0].trim();
         dictionary[currentSection] = [];
-      } else if (row.length > 1) {
+      } else if (row.length === 4) {
         if (row[0] === "Course" && row[1] === "Credits" && row[2] === "Type" && row[3] === "Professor") {
           return;
         }
         dictionary[currentSection].push([row[0].trim(), parseInt(row[1]), row[2].trim(), row[3].trim()]);
+      } else {
+        check = false;
+        return;
       }
     });
-
+    if(!check){
+      return {}
+    }
     return dictionary;
   };
 
   const createList_labs = (data) => {
     const labs = [];
+    let check = true;
     data.forEach(row => {
+      if(row.length != 1){
+        check = false
+        return;
+      }
       labs.push(row[0])
     })
+    if(!check){
+      return [];
+    }
     return labs;
   }
 
   const creatDictionary_proff = (data) => {
     const proffs_to_short = {}
+    let check = true;
     data.forEach(row => {
+      if(row.length != 2){
+        check = false
+        return;
+      }
       proffs_to_short[row[0]] = row[1]
     })
+    if(!check){
+      return {}
+    }
     return proffs_to_short;
   }
 
   const createList_proffs = (data) => {
     const proffs_names = []
+    let check = true
     data.forEach(row => {
+      if(row.length != 1){
+        check = false
+        return;
+      }
       proffs_names.push(row[0]);
     })
+    if(!check){}
     return proffs_names;
   }
 
@@ -156,8 +184,8 @@ export default function Table() {
   };
 
   return (
-    <main className="min-h-screen bg-[#B4D2E7]">
-      <Sidebar />
+    <main className="min-h-screen w-fit md:w-full bg-[#B4D2E7]">
+      <Sidebar/>
       <div className="flex ml-12">
         <div className="">
           <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
@@ -208,10 +236,10 @@ export default function Table() {
               <div className="font-black mr-auto ml-2 text-2xl mb-3">{dataa.replace("B_Tech", "B.Tech")}</div>
               <div className="flex items-center mb-4 rounded-lg px-2">
                 <div className=" flex flex-col items-center rounded-lg">
-                  <div className="w-24  h-8 flex items-center justify-center border bg-[#909090] rounded-lg mr-1">
+                  <div className="md:w-24  md:h-8 w-12 h-4 flex items-center justify-center border bg-[#909090] rounded-lg mr-1">
                     Slot
                   </div>
-                  <div className="w-24  h-8 flex items-center justify-center border bg-[#909090] rounded-lg mr-1">
+                  <div className="md:w-24 md:h-8 w-12 h-4 flex items-center justify-center border bg-[#909090] rounded-lg mr-1">
                     Day
                   </div>
                 </div>
@@ -219,7 +247,7 @@ export default function Table() {
                   {index <= 5 ? year1.map((slot, index) => (
                     <div
                       key={index}
-                      className="w-24 h-16 flex items-center justify-center bg-[#bfc0c0] rounded-lg "
+                      className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-[10px] justify-center bg-[#bfc0c0] rounded-lg "
                     >
                       {slot}
                     </div>
@@ -237,7 +265,7 @@ export default function Table() {
                   ].map((slot, index) => (
                     <div
                       key={index}
-                      className="w-24 h-16 flex items-center justify-center bg-[#bfc0c0] rounded-lg "
+                      className="w-12 h-8 md:w-24 md:h-16 flex items-center justify-center bg-[#bfc0c0] rounded-lg "
                     >
                       {slot}
                     </div>
@@ -249,7 +277,7 @@ export default function Table() {
                   {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => (
                     <div
                       key={index}
-                      className="w-24 h-16 flex items-center justify-center border bg-[#bfc0c0] rounded-lg"
+                      className="w-12 h-8 md:w-24 md:h-16 flex text-[7px] md:text-[10px] items-center justify-center border bg-[#bfc0c0] rounded-lg"
                     >
                       {day}
                     </div>
@@ -261,7 +289,7 @@ export default function Table() {
                       {Array.from({ length: 5 }).map((_, rowIndex) => (
                         <div
                           key={colIndex + rowIndex}
-                          className="w-24 h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[10px]"
+                          className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
                         >
                           {timetableData[dataa][rowIndex][colIndex] != "b" &&
                             timetableData[dataa][rowIndex][colIndex] != "l" ? (

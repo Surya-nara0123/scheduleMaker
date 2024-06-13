@@ -24,7 +24,7 @@ const Sidebar = () => {
   }
 
   return (
-    <main className="min-h-screen bg-[#B4D2E7] fixed">
+    <main className="min-h-screen bg-[#B4D2E7] md:fixed">
       <div className="">
         <div
           id="sidebar"
