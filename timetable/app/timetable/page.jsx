@@ -184,14 +184,14 @@ export default function Table() {
   };
 
   return (
-    <main className="min-h-screen w-fit md:w-full bg-[#B4D2E7]">
+    <main className="w-fit md:w-full bg-[#B4D2E7]">
       <Sidebar/>
-      <div className="flex ml-12">
+      <div className="flex md:ml-12 p-2">
         <div className="">
           <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
           <div className="bg-white h-0.5 w-1/2 mt-1 ml-12"></div>
           <div className="m-5 items-center justify-center p-3 ml-10">
-            <div className="mt-8 flex flex-wrap w-full space-y-4 md:space-y-0 md:space-x-4">
+            <div className="mt-8 flex flex-wrap w-full">
               <div className="w-full md:w-auto mb-4">
                 <label className="block mb-2">Class to Courses</label>
                 <input
@@ -232,14 +232,14 @@ export default function Table() {
             <button className="bg-green-500 justify-center items-center rounded-lg p-2" onClick={printOutput}>Generate Timetable</button>
           </div>
           {Object.keys(timetableData).map((dataa, index) => (
-            <div className="mt-12 ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
+            <div className="md:mt-12 md:ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
               <div className="font-black mr-auto ml-2 text-2xl mb-3">{dataa.replace("B_Tech", "B.Tech")}</div>
               <div className="flex items-center mb-4 rounded-lg px-2">
                 <div className=" flex flex-col items-center rounded-lg">
-                  <div className="md:w-24  md:h-8 w-12 h-4 flex items-center justify-center border bg-[#909090] rounded-lg mr-1">
+                  <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
                     Slot
                   </div>
-                  <div className="md:w-24 md:h-8 w-12 h-4 flex items-center justify-center border bg-[#909090] rounded-lg mr-1">
+                  <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
                     Day
                   </div>
                 </div>
@@ -247,7 +247,7 @@ export default function Table() {
                   {index <= 5 ? year1.map((slot, index) => (
                     <div
                       key={index}
-                      className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-[10px] justify-center bg-[#bfc0c0] rounded-lg "
+                      className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
                     >
                       {slot}
                     </div>
@@ -265,7 +265,7 @@ export default function Table() {
                   ].map((slot, index) => (
                     <div
                       key={index}
-                      className="w-12 h-8 md:w-24 md:h-16 flex items-center justify-center bg-[#bfc0c0] rounded-lg "
+                      className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
                     >
                       {slot}
                     </div>
@@ -277,7 +277,7 @@ export default function Table() {
                   {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => (
                     <div
                       key={index}
-                      className="w-12 h-8 md:w-24 md:h-16 flex text-[7px] md:text-[10px] items-center justify-center border bg-[#bfc0c0] rounded-lg"
+                      className="w-12 h-8 md:w-24 md:h-16 flex text-[7px] md:text-sm items-center justify-center border bg-[#bfc0c0] rounded-lg"
                     >
                       {day}
                     </div>
