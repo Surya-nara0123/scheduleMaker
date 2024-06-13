@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "papaparse": "^5.4.1",
+    "pocketbase": "^0.21.3"
+  }
+}
