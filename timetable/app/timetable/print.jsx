@@ -120,7 +120,7 @@ export async function generatePDF(timetableData) {
   const subTitle3 = "With Effect from 22.01.2024";
   const room = "206 (Academic Block 2)";
   const classAdvisor = "Dr. Padmavathi U";
-  const multiCourseCommitteeChairman = "Dr. T.Natrajan";
+  const multiCourseCommitteeChairman = "Dr. T Nagarajan";
 
   doc.setFontSize(6);
   doc.setFont("Helvetica", "bold");
