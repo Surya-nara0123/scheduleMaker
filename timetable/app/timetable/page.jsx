@@ -76,11 +76,18 @@ export default function Table() {
 
   const printOutput = async () => {
     if (file1 && file2 && file3 && file4) {
-
+      let index = 0
       const processFiles = [file1, file2, file3, file4];
+      let done_files = []
       let results = []
       for (const file of processFiles) {
-        let file_name = file.name
+        let file_name = file.name;
+        if (done_files.includes(file_name)) {
+          alert("Repeating Files!!");
+          return
+        } else {
+          done_files.push(file_name);
+        }
         const result = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = function (e) {
@@ -91,11 +98,11 @@ export default function Table() {
               complete: function (results) {
                 const data = results.data;
                 let dictionary = {}
-                if (file_name.includes("class")) {
+                if (index === 0) {
                   dictionary = createDictionary_class(data);
-                } else if (file_name.includes("lab")) {
+                } else if (index === 1) {
                   dictionary = createList_labs(data);
-                } else if (file_name.includes("names")) {
+                } else if (index === 2) {
                   dictionary = createList_proffs(data);
                 } else {
                   dictionary = creatDictionary_proff(data);
@@ -106,7 +113,12 @@ export default function Table() {
           };
           reader.readAsText(file);
         });
+        if ((Array.isArray(result) && result.length === 0) || result == {}) {
+          alert("Improper File = " + file_name);
+          return;
+        }
         results.push(result);
+        index += 1
       }
       let class_courses = {};
       let professors = [];
@@ -115,7 +127,6 @@ export default function Table() {
 
       for (const index in results) {
         let thing = results[index];
-
         if (typeof thing === 'object' && !Array.isArray(thing)) {
           let keys = Object.keys(thing);
           if (keys[0].includes("Year")) {
@@ -152,31 +163,43 @@ export default function Table() {
           <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
           <div className="bg-white h-0.5 w-1/2 mt-1 ml-12"></div>
           <div className="m-5 items-center justify-center p-3 ml-10">
-            <div className="mt-8">
-              <input
-                className="rounded-lg p-2"
-                type="file"
-                accept=".csv"
-                onChange={(e) => handleFileChange(e, setFile1)}
-              />
-              <input
-                className="rounded-lg p-2"
-                type="file"
-                accept=".csv"
-                onChange={(e) => handleFileChange(e, setFile2)}
-              />
-              <input
-                className="rounded-lg p-2"
-                type="file"
-                accept=".csv"
-                onChange={(e) => handleFileChange(e, setFile3)}
-              />
-              <input
-                className="rounded-lg p-2"
-                type="file"
-                accept=".csv"
-                onChange={(e) => handleFileChange(e, setFile4)}
-              />
+            <div className="mt-8 flex flex-wrap w-full space-y-4 md:space-y-0 md:space-x-4">
+              <div className="w-full md:w-auto mb-4">
+                <label className="block mb-2">Class to Courses</label>
+                <input
+                  className="rounded-lg p-2 w-full"
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => handleFileChange(e, setFile1)}
+                />
+              </div>
+              <div className="w-full md:w-auto mb-4">
+                <label className="block mb-2">Labs</label>
+                <input
+                  className="rounded-lg p-2 w-full"
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => handleFileChange(e, setFile2)}
+                />
+              </div>
+              <div className="w-full md:w-auto mb-4">
+                <label className="block mb-2">Professors Names</label>
+                <input
+                  className="rounded-lg p-2 w-full"
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => handleFileChange(e, setFile3)}
+                />
+              </div>
+              <div className="w-full md:w-auto mb-4">
+                <label className="block mb-2">Professor's Shortform</label>
+                <input
+                  className="rounded-lg p-2 w-full"
+                  type="file"
+                  accept=".csv"
+                  onChange={(e) => handleFileChange(e, setFile4)}
+                />
+              </div>
             </div>
             <button className="bg-green-500 justify-center items-center rounded-lg p-2" onClick={printOutput}>Generate Timetable</button>
           </div>
