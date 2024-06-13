@@ -6,7 +6,7 @@ import Sidebar from "../Components/Sidebar";
 import SVGStar from "../Components/star";
 import { generatePDF } from "./print.jsx";
 import { startProcess } from "./algo.jsx";
-import Papa from 'papaparse';
+import Papa from "papaparse";
 
 export default function Table() {
   const year1 = [
@@ -33,25 +33,35 @@ export default function Table() {
 
   const createDictionary_class = (data) => {
     const dictionary = {};
-    let currentSection = '';
+    let currentSection = "";
     let check = true;
 
-    data.forEach(row => {
+    data.forEach((row) => {
       if (row.length === 1) {
         currentSection = row[0].trim();
         dictionary[currentSection] = [];
       } else if (row.length === 4) {
-        if (row[0] === "Course" && row[1] === "Credits" && row[2] === "Type" && row[3] === "Professor") {
+        if (
+          row[0] === "Course" &&
+          row[1] === "Credits" &&
+          row[2] === "Type" &&
+          row[3] === "Professor"
+        ) {
           return;
         }
-        dictionary[currentSection].push([row[0].trim(), parseInt(row[1]), row[2].trim(), row[3].trim()]);
+        dictionary[currentSection].push([
+          row[0].trim(),
+          parseInt(row[1]),
+          row[2].trim(),
+          row[3].trim(),
+        ]);
       } else {
         check = false;
         return;
       }
     });
-    if(!check){
-      return {}
+    if (!check) {
+      return {};
     }
     return dictionary;
   };
@@ -59,60 +69,61 @@ export default function Table() {
   const createList_labs = (data) => {
     const labs = [];
     let check = true;
-    data.forEach(row => {
-      if(row.length != 1){
-        check = false
+    data.forEach((row) => {
+      if (row.length != 1) {
+        check = false;
         return;
       }
-      labs.push(row[0])
-    })
-    if(!check){
+      labs.push(row[0]);
+    });
+    if (!check) {
       return [];
     }
     return labs;
-  }
+  };
 
   const creatDictionary_proff = (data) => {
-    const proffs_to_short = {}
+    const proffs_to_short = {};
     let check = true;
-    data.forEach(row => {
-      if(row.length != 2){
-        check = false
+    data.forEach((row) => {
+      if (row.length != 2) {
+        check = false;
         return;
       }
-      proffs_to_short[row[0]] = row[1]
-    })
-    if(!check){
-      return {}
+      proffs_to_short[row[0]] = row[1];
+    });
+    if (!check) {
+      return {};
     }
     return proffs_to_short;
-  }
+  };
 
   const createList_proffs = (data) => {
-    const proffs_names = []
-    let check = true
-    data.forEach(row => {
-      if(row.length != 1){
-        check = false
+    const proffs_names = [];
+    let check = true;
+    data.forEach((row) => {
+      if (row.length != 1) {
+        check = false;
         return;
       }
       proffs_names.push(row[0]);
-    })
-    if(!check){}
+    });
+    if (!check) {
+    }
     return proffs_names;
-  }
+  };
 
   const printOutput = async () => {
     if (file1 && file2 && file3 && file4) {
-      let index = 0
+      let index = 0;
       const processFiles = [file1, file2, file3, file4];
-      let done_files = []
-      let results = []
+      let done_files = [];
+      let results = [];
       for (const file of processFiles) {
         let file_name = file.name;
         if (done_files.includes(file_name)) {
           alert("Repeating Files!!");
-          return
+          return;
         } else {
           done_files.push(file_name);
         }
@@ -125,7 +136,7 @@ export default function Table() {
               skipEmptyLines: true,
               complete: function (results) {
                 const data = results.data;
-                let dictionary = {}
+                let dictionary = {};
                 if (index === 0) {
                   dictionary = createDictionary_class(data);
                 } else if (index === 1) {
@@ -136,7 +147,7 @@ export default function Table() {
                   dictionary = creatDictionary_proff(data);
                 }
                 resolve(dictionary);
-              }
+              },
             });
           };
           reader.readAsText(file);
@@ -146,7 +157,7 @@ export default function Table() {
           return;
         }
         results.push(result);
-        index += 1
+        index += 1;
       }
       let class_courses = {};
       let professors = [];
@@ -155,7 +166,7 @@ export default function Table() {
 
       for (const index in results) {
         let thing = results[index];
-        if (typeof thing === 'object' && !Array.isArray(thing)) {
+        if (typeof thing === "object" && !Array.isArray(thing)) {
           let keys = Object.keys(thing);
           if (keys[0].includes("Year")) {
             class_courses = JSON.parse(JSON.stringify(thing));
@@ -170,7 +181,12 @@ export default function Table() {
           }
         }
       }
-      let a = await startProcess(class_courses, professors, proffs_names_to_short, labs);
+      let a = await startProcess(
+        class_courses,
+        professors,
+        proffs_names_to_short,
+        labs
+      );
       setTimetableData(a);
     } else {
       alert("Please upload all 4 CSV files.");
@@ -178,14 +194,14 @@ export default function Table() {
   };
 
   const genPDF = (classTitle) => {
-    let temp = {}
+    let temp = {};
     temp[classTitle] = timetableData[classTitle];
     generatePDF(temp);
   };
 
   return (
     <main className="w-fit md:w-full min-h-screen bg-[#B4D2E7]">
-      <Sidebar/>
+      <Sidebar />
       <div className="flex md:ml-12 p-2">
         <div className="">
           <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
@@ -229,11 +245,26 @@ export default function Table() {
                 />
               </div>
             </div>
-            <button className="bg-green-500 justify-center items-center rounded-lg p-2" onClick={printOutput}>Generate Timetable</button>
+            <div className="flex">
+              <button
+                className="bg-green-500 justify-center items-center rounded-lg p-2"
+                onClick={printOutput}
+              >
+                Generate Timetable
+              </button>
+              <button
+                className="bg-blue-500 justify-center items-center rounded-lg p-2 ml-2"
+                onClick={printOutput}
+              >
+                Download All Timetables
+              </button>
+            </div>
           </div>
           {Object.keys(timetableData).map((dataa, index) => (
             <div className="md:mt-12 md:ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
-              <div className="font-black mr-auto ml-2 text-2xl mb-3">{dataa.replace("B_Tech", "B.Tech")}</div>
+              <div className="font-black mr-auto ml-2 text-2xl mb-3">
+                {dataa.replace("B_Tech", "B.Tech")}
+              </div>
               <div className="flex items-center mb-4 rounded-lg px-2">
                 <div className=" flex flex-col items-center rounded-lg">
                   <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
@@ -244,32 +275,34 @@ export default function Table() {
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  {index <= 5 ? year1.map((slot, index) => (
-                    <div
-                      key={index}
-                      className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                    >
-                      {slot}
-                    </div>
-                  )) : [
-                    "8.10-9.00",
-                    "9.00-9.50",
-                    "9.50-10.40",
-                    "break",
-                    "11.00-11.50",
-                    "11.50-12.40",
-                    "Lunch",
-                    "1.40-2.30",
-                    "break",
-                    "2.40-3.30",
-                  ].map((slot, index) => (
-                    <div
-                      key={index}
-                      className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                    >
-                      {slot}
-                    </div>
-                  ))}
+                  {index <= 5
+                    ? year1.map((slot, index) => (
+                        <div
+                          key={index}
+                          className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                        >
+                          {slot}
+                        </div>
+                      ))
+                    : [
+                        "8.10-9.00",
+                        "9.00-9.50",
+                        "9.50-10.40",
+                        "break",
+                        "11.00-11.50",
+                        "11.50-12.40",
+                        "Lunch",
+                        "1.40-2.30",
+                        "break",
+                        "2.40-3.30",
+                      ].map((slot, index) => (
+                        <div
+                          key={index}
+                          className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                        >
+                          {slot}
+                        </div>
+                      ))}
                 </div>
               </div>
               <div className="flex">
@@ -292,7 +325,7 @@ export default function Table() {
                           className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
                         >
                           {timetableData[dataa][rowIndex][colIndex] != "b" &&
-                            timetableData[dataa][rowIndex][colIndex] != "l" ? (
+                          timetableData[dataa][rowIndex][colIndex] != "l" ? (
                             <div className="text-center w-full h-full items-center justify-center flex font-bold">
                               {timetableData[dataa][rowIndex][colIndex]}
                             </div>
