@@ -57,6 +57,10 @@ export default function Table() {
       const processFiles = [file1, file2, file3, file4];
       let results = [];
       for (const file of processFiles) {
+        console.log(file.name);
+        if (file.name != "class_courses.csv") {
+          continue;
+        }
         const result = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = function (e) {
@@ -75,7 +79,7 @@ export default function Table() {
         });
         results.push(result);
       }
-
+      console.log(results);
       let a = await startProcess(results[0]);
       setTimetableData(a);
     } else {
