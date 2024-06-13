@@ -24,7 +24,7 @@ function Login() {
         <h1>Login</h1>
         <div className="flex-col flex">
           <input
-          className="m-3 rounded-md p-3"
+            className="m-3 rounded-md p-3"
             type="text"
             placeholder="email"
             onChange={(e) => {
@@ -32,14 +32,18 @@ function Login() {
             }}
           />
           <input
-          className="m-3 rounded-md p-3"
+            className="m-3 rounded-md p-3"
             type="password"
             placeholder="Password"
             onChange={(e) => {
               setUser({ ...user, password: e.target.value });
             }}
           />
-          <button type="submit" onClick={handleLogin}>
+          <button
+            type="submit"
+            onClick={handleLogin}
+            className="mx-auto w-fit m-3 p-3 px-6 bg-white rounded-full"
+          >
             Login
           </button>
         </div>

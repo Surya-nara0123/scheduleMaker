@@ -184,7 +184,7 @@ export default function Table() {
   };
 
   return (
-    <main className="w-fit md:w-full bg-[#B4D2E7]">
+    <main className="w-fit md:w-full min-h-screen bg-[#B4D2E7]">
       <Sidebar/>
       <div className="flex md:ml-12 p-2">
         <div className="">
