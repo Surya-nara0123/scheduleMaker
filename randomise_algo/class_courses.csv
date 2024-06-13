@@ -1,0 +1,107 @@
+Course,Credits,Type,Professor
+1st Year B_Tech AIDS Section A
+ENG101,3,T,Proff0
+MTH101,4,T,Proff1
+PHY101,3,T,Proff2
+ENV101,2,T,Proff3
+CSE101,3,T,Proff4
+ECE101,4,LT,Proff5
+CSE102,4,L,Proff6
+PHY102,4,L,Proff7
+1st Year B_Tech AIDS Section B
+ENG101,3,T,Proff0
+MTH101,4,T,Proff8
+PHY101,3,T,Proff2
+ENV101,2,T,Proff3
+CSE101,3,T,Proff9
+ECE101,4,LT,Proff5
+CSE102,4,L,Proff9
+PHY102,4,L,Proff7
+1st Year B_Tech AIDS Section C
+ENG101,3,T,Proff10
+MTH101,4,T,Proff8
+PHY101,3,T,Proff14
+ENV101,2,T,Proff3
+CSE101,3,T,Proff9
+ECE101,4,LT,Proff5
+CSE102,4,L,Proff9
+PHY102,4,L,Proff14
+1st Year B_Tech IoT Section A
+ENG101,3,T,Proff10
+MTH101,3,T,Proff11
+PHY103,3,T,Proff9
+ENV101,2,T,Proff3
+CSE101,3,T,Proff12
+ECE103,3,T,Proff13
+CSE102,4,L,Proff12
+ECE104,4,L,Proff13
+1st Year B_Tech IoT Section B
+ENG101,3,T,Proff10
+MTH101,3,T,Proff8
+PHY103,3,T,Proff9
+ENV101,2,T,Proff3
+CSE101,3,T,Proff6
+ECE103,3,T,Proff13
+CSE102,4,L,Proff6
+ECE104,4,L,Proff13
+1st Year B_Tech Cyber Security
+ENG101,3,T,Proff0
+MTH101,4,T,Proff1
+PHY101,3,T,Proff14
+CSE201,4,T,Proff6
+CSE101,3,T,Proff5
+ECE101,4,LT,Proff12
+CSE102,4,L,Proff5
+PHY102,4,L,Proff14
+2nd Year B_Tech AIDS Section A
+MTH201,4,T,Proff15
+CSE202,3,T,Proff16
+CSE203,5,LT,Proff4
+CSE204,3,T,Proff17
+CSE205,2,T,Proff18
+PSY201,2,T,Proff19
+CSE206,4,L,Proff16
+CSE207,4,L,Proff18
+2nd Year B_Tech AIDS Section B
+MTH201,4,T,Proff20
+CSE202,3,T,Proff16
+CSE203,5,LT,Proff4
+CSE204,3,T,Proff17
+CSE205,2,T,Proff18
+PSY201,2,T,Proff19
+CSE206,4,L,Proff16
+CSE207,4,L,Proff18
+2nd Year B_Tech AIDS Section C
+MTH201,4,T,Proff20
+CSE202,3,T,Proff16
+CSE203,5,LT,Proff4
+CSE204,3,T,Proff17
+CSE205,2,T,Proff18
+PSY201,2,T,Proff19
+CSE206,4,L,Proff16
+CSE207,4,L,Proff18
+2nd Year B_Tech IoT Section A
+MTH201,4,T,Proff20
+CSE211,3,T,Proff21
+CSE202,3,T,Proff22
+CSE208,3,T,Proff23
+CSE212,3,T,Proff24
+CSE206,4,L,Proff21
+CSE210,4,L,Proff23
+2nd Year B_Tech IoT Section B
+MTH201,4,T,Proff15
+CSE211,3,T,Proff21
+CSE202,3,T,Proff22
+CSE208,3,T,Proff23
+CSE212,3,T,Proff24
+CSE206,4,L,Proff21
+CSE210,4,L,Proff23
+2nd Year B_Tech Cyber Security
+MTH201,3,T,Proff25
+CSE202,3,T,Proff22
+CSE208,3,T,Proff27
+CSE203,5,LT,Proff26
+CSE209,2,T,Proff28
+PSY201,2,T,Proff19
+CSE206,4,L,Proff22
+CSE210,4,L,Proff27

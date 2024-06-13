@@ -6,7 +6,7 @@ import Sidebar from "../Components/Sidebar";
 import SVGStar from "../Components/star";
 import { generatePDF } from "./print.jsx";
 import { startProcess } from "./algo.jsx";
-
+import Papa from 'papaparse';
 
 export default function Table() {
   const year1 = [
@@ -22,9 +22,67 @@ export default function Table() {
     "2.40-3.30",
   ];
   const [timetableData, setTimetableData] = useState([]);
+  const [file1, setFile1] = useState(null);
+  const [file2, setFile2] = useState(null);
+  const [file3, setFile3] = useState(null);
+  const [file4, setFile4] = useState(null);
+
+  const handleFileChange = (e, setFile) => {
+    setFile(e.target.files[0]);
+  };
+
+    const parseCSV = (file, callback) => {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const text = e.target.result;
+      Papa.parse(text, {
+        header: false,
+        skipEmptyLines: true,
+        complete: function (results) {
+          const data = results.data;
+          const dictionary = createDictionary(data);
+          callback(dictionary);
+        }
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  const createDictionary = (data) => {
+    const dictionary = {};
+    let currentSection = '';
+
+    data.forEach(row => {
+      if (row.length === 1) {
+        currentSection = row[0].trim();
+        dictionary[currentSection] = [];
+      } else if (row.length > 1) {
+        if (row[0] === "Course" && row[1] === "Credits" && row[2] === "Type" && row[3] === "Professor") {
+          return;
+        }
+        dictionary[currentSection].push([row[0].trim(), parseInt(row[1]), row[2].trim(), row[3].trim()]);
+      }
+    });
+
+    return dictionary;
+  };
+
   const printOutput = async () => {
-    let a = await startProcess();
-    setTimetableData(a);
+    if (file1 && file2 && file3 && file4) {
+      const dictionaries = [];
+
+      const processFiles = [file1, file2, file3, file4].map(file => 
+        new Promise((resolve) => parseCSV(file, resolve))
+      );
+
+      Promise.all(processFiles).then((results) => {
+        let a = startProcess(results[0]);
+        console.log(a)
+        setTimetableData(a);
+      });
+    } else {
+      alert("Please upload all 4 CSV files.");
+    }
   };
   const genPDF = (classTitle) => {
     let temp = {}
@@ -39,6 +97,29 @@ export default function Table() {
           <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
           <div className="bg-white h-0.5 w-1/2 mt-1 ml-12"></div>
           <div className="m-5 items-center justify-center p-3 ml-10">
+          <div className="mt-8">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => handleFileChange(e, setFile1)}
+            />
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => handleFileChange(e, setFile2)}
+            />
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => handleFileChange(e, setFile3)}
+            />
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => handleFileChange(e, setFile4)}
+            />
+          </div>
+          <button className="bg-green-500 justify-center items-center rounded-lg p-2" onClick={printOutput}>Generate Timetable</button>
           </div>
           {Object.keys(timetableData).map((dataa, index) => (
             <div className="mt-12 ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
