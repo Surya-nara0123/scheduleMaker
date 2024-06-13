@@ -123,7 +123,7 @@ export default function Table() {
           </div>
           {Object.keys(timetableData).map((dataa, index) => (
             <div className="mt-12 ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
-              <div className="font-black mr-auto ml-2 text-2xl">{dataa.replace("B_Tech", "B.Tech")}</div>
+              <div className="font-black mr-auto ml-2 text-2xl mb-3">{dataa.replace("B_Tech", "B.Tech")}</div>
               <div className="flex items-center mb-4 rounded-lg px-2">
                 <div className=" flex flex-col items-center rounded-lg">
                   <div className="w-24  h-8 flex items-center justify-center border bg-[#909090] rounded-lg mr-1">
