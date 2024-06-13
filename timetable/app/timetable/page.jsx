@@ -31,23 +31,6 @@ export default function Table() {
     setFile(e.target.files[0]);
   };
 
-    const parseCSV = (file, callback) => {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const text = e.target.result;
-      Papa.parse(text, {
-        header: false,
-        skipEmptyLines: true,
-        complete: function (results) {
-          const data = results.data;
-          const dictionary = createDictionary(data);
-          callback(dictionary);
-        }
-      });
-    };
-    reader.readAsText(file);
-  };
-
   const createDictionary = (data) => {
     const dictionary = {};
     let currentSection = '';
@@ -71,24 +54,41 @@ export default function Table() {
     if (file1 && file2 && file3 && file4) {
       const dictionaries = [];
 
-      const processFiles = [file1, file2, file3, file4].map(file => 
-        new Promise((resolve) => parseCSV(file, resolve))
-      );
+      const processFiles = [file1, file2, file3, file4];
+      let results = [];
+      for (const file of processFiles) {
+        const result = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const text = e.target.result;
+            Papa.parse(text, {
+              header: false,
+              skipEmptyLines: true,
+              complete: function (results) {
+                const data = results.data;
+                const dictionary = createDictionary(data);
+                resolve(dictionary);
+              }
+            });
+          };
+          reader.readAsText(file);
+        });
+        results.push(result);
+      }
 
-      Promise.all(processFiles).then((results) => {
-        let a = startProcess(results[0]);
-        console.log(a)
-        setTimetableData(a);
-      });
+      let a = await startProcess(results[0]);
+      setTimetableData(a);
     } else {
       alert("Please upload all 4 CSV files.");
     }
   };
+
   const genPDF = (classTitle) => {
     let temp = {}
     temp[classTitle] = timetableData[classTitle];
     generatePDF(temp);
   };
+
   return (
     <main className="min-h-screen bg-[#B4D2E7]">
       <Sidebar />
@@ -99,21 +99,25 @@ export default function Table() {
           <div className="m-5 items-center justify-center p-3 ml-10">
           <div className="mt-8">
             <input
+            className="rounded-lg p-2"
               type="file"
               accept=".csv"
               onChange={(e) => handleFileChange(e, setFile1)}
             />
             <input
+            className="rounded-lg p-2"
               type="file"
               accept=".csv"
               onChange={(e) => handleFileChange(e, setFile2)}
             />
             <input
+            className="rounded-lg p-2"
               type="file"
               accept=".csv"
               onChange={(e) => handleFileChange(e, setFile3)}
             />
             <input
+            className="rounded-lg p-2"
               type="file"
               accept=".csv"
               onChange={(e) => handleFileChange(e, setFile4)}

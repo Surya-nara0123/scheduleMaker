@@ -950,7 +950,6 @@ async function randomize(class_courses) {
     
     try {
         const result = await get_timetables(professors, labs, class_courses, proff_to_short);
-        console.log(result[0])
         return result[0]
     } catch (error) {
         console.error('Error generating timetables:', error);
@@ -958,7 +957,6 @@ async function randomize(class_courses) {
 }
 
 export async function  startProcess(class_courses) {
-    let a = await randomize(class_courses);
-    console.log(class_courses)
-    return a;
+    let b = await randomize(class_courses);
+    return b;
 }
