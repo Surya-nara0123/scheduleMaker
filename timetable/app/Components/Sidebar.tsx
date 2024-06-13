@@ -8,7 +8,7 @@ const Sidebar = () => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-
+  const [isLoggedin, setIsLoggedin] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -16,7 +16,6 @@ const Sidebar = () => {
   const toggleSidebar = () => {
     setIsSidebarExpanded(!isSidebarExpanded);
   };
-
   const isActive = (path: string) =>
     pathname === path ? "bg-[#f8f8f8] bg-opacity-25" : "";
 
@@ -95,6 +94,9 @@ const Sidebar = () => {
               </svg>
               <span>Time Table</span>
             </Link>
+            {/* <Link>
+              
+            </Link> */}
           </div>
         </div>
       </div>
