@@ -4,8 +4,6 @@ import { useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import snu02 from "../Components/snu-02.jpg";
 import Image from "next/image";
-import { toast } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css";
 
 const pb = new pocketbase("https://snuc.pockethost.io");
 
