@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import SVGStar from "../Components/star";
 import { generatePDF } from "./print.jsx";
@@ -196,88 +196,90 @@ export default function Table() {
     }
   };
 
-  const convertDetails = async(data) => {
+  const convertDetails = async (data) => {
     let index = 0;
-      const processFiles = [file1, file2, file3, file4];
-      let done_files = [];
-      let results = [];
-      for (const file of processFiles) {
-        let file_name = file.name;
-        if (done_files.includes(file_name)) {
-          alert("Repeating Files!!");
-          return;
+    const processFiles = [file1, file2, file3, file4];
+    let done_files = [];
+    let results = [];
+    for (const file of processFiles) {
+      let file_name = file.name;
+      if (done_files.includes(file_name)) {
+        alert("Repeating Files!!");
+        return;
+      } else {
+        done_files.push(file_name);
+      }
+      const result = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const text = e.target.result;
+          Papa.parse(text, {
+            header: false,
+            skipEmptyLines: true,
+            complete: function (results) {
+              const data = results.data;
+              let dictionary = {};
+              if (index === 0) {
+                dictionary = createDictionary_class(data);
+              } else if (index === 1) {
+                dictionary = createList_labs(data);
+              } else if (index === 2) {
+                dictionary = createList_proffs(data);
+              } else {
+                dictionary = creatDictionary_proff(data);
+              }
+              resolve(dictionary);
+            },
+          });
+        };
+        reader.readAsText(file);
+      });
+      if ((Array.isArray(result) && result.length === 0) || result == {}) {
+        alert("Improper File = " + file_name);
+        return;
+      }
+      results.push(result);
+      index += 1;
+    }
+    let class_courses = {};
+    let professors = [];
+    let proffs_names_to_short = {};
+    let labs = [];
+
+    for (const index in results) {
+      let thing = results[index];
+      if (typeof thing === "object" && !Array.isArray(thing)) {
+        let keys = Object.keys(thing);
+        if (keys[0].includes("Year")) {
+          class_courses = JSON.parse(JSON.stringify(thing));
         } else {
-          done_files.push(file_name);
+          proffs_names_to_short = JSON.parse(JSON.stringify(thing));
         }
-        const result = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const text = e.target.result;
-            Papa.parse(text, {
-              header: false,
-              skipEmptyLines: true,
-              complete: function (results) {
-                const data = results.data;
-                let dictionary = {};
-                if (index === 0) {
-                  dictionary = createDictionary_class(data);
-                } else if (index === 1) {
-                  dictionary = createList_labs(data);
-                } else if (index === 2) {
-                  dictionary = createList_proffs(data);
-                } else {
-                  dictionary = creatDictionary_proff(data);
-                }
-                resolve(dictionary);
-              },
-            });
-          };
-          reader.readAsText(file);
-        });
-        if ((Array.isArray(result) && result.length === 0) || result == {}) {
-          alert("Improper File = " + file_name);
-          return;
+      } else if (Array.isArray(thing)) {
+        if (thing[0].includes("LAB")) {
+          labs = JSON.parse(JSON.stringify(thing));
+        } else {
+          professors = JSON.parse(JSON.stringify(thing));
         }
-        results.push(result);
-        index += 1;
       }
-      let class_courses = {};
-      let professors = [];
-      let proffs_names_to_short = {};
-      let labs = [];
+    }
+    let course = class_courses[data];
+    let profs = professors;
 
-      for (const index in results) {
-        let thing = results[index];
-        if (typeof thing === "object" && !Array.isArray(thing)) {
-          let keys = Object.keys(thing);
-          if (keys[0].includes("Year")) {
-            class_courses = JSON.parse(JSON.stringify(thing));
-          } else {
-            proffs_names_to_short = JSON.parse(JSON.stringify(thing));
-          }
-        } else if (Array.isArray(thing)) {
-          if (thing[0].includes("LAB")) {
-            labs = JSON.parse(JSON.stringify(thing));
-          } else {
-            professors = JSON.parse(JSON.stringify(thing));
-          }
-        }
-      }
-      let course = class_courses[data];
-      let profs = professors;
-
-      let proffDetails = [];
-      for(let i=0;i<course.length;i++){
-        let temp = {}
-        temp[course[i][0]] = [
-          course[i][0], course[i][3], proffs_names_to_short[course[i][3]], "HS", 3
-        ]
-        proffDetails.push(
-            temp,
-        )
-      }
-      console.log(proffDetails);
-      return proffDetails;
+    let proffDetails = [];
+    for (let i = 0; i < course.length; i++) {
+      let temp = {};
+      temp[course[i][0]] = [
+        course[i][0],
+        course[i][3],
+        proffs_names_to_short[course[i][3]],
+        "HS",
+        3,
+      ];
+      proffDetails.push(temp);
+    }
+    console.log(proffDetails);
+    return proffDetails;
   };
 
   const genPDF = async (classTitle) => {
@@ -292,175 +294,198 @@ export default function Table() {
       timetable: timetableData,
     };
 
-    const record = await pb.collection('timetable').update("wizw6h9iga918ub", data);
+    const record = await pb
+      .collection("timetable")
+      .update("wizw6h9iga918ub", data);
   };
+
+  const [isLoggedin, setLoggedin] = useState(false);
+
+  useEffect(() => {
+    console.log(pb.authStore.model.isStudent);
+    const model = pb.authStore.model;
+    if (!model) {
+      setLoggedin(false);
+    } else {
+      setLoggedin(true);
+      if (model.isAdmin == true) {
+        setLoggedin(true);
+      } else {
+        setLoggedin(false);
+      }
+    }
+  }, []);
 
   return (
     <main className="w-fit md:w-full min-h-screen bg-[#B4D2E7]">
       <Sidebar />
-      <div className="flex md:ml-12 p-2">
-        <div className="">
-          <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
-          <div className="bg-white h-0.5 w-1/2 mt-1 ml-12"></div>
-          <div className="m-5 items-center justify-center p-3 ml-10">
-            <div className="mt-8 flex flex-wrap w-full">
-              <div className="w-full md:w-auto mb-4">
-                <label className="block mb-2">Class to Courses</label>
-                <input
-                  className="rounded-lg p-2 w-full"
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => handleFileChange(e, setFile1)}
-                />
-              </div>
-              <div className="w-full md:w-auto mb-4">
-                <label className="block mb-2">Labs</label>
-                <input
-                  className="rounded-lg p-2 w-full"
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => handleFileChange(e, setFile2)}
-                />
-              </div>
-              <div className="w-full md:w-auto mb-4">
-                <label className="block mb-2">Professors Names</label>
-                <input
-                  className="rounded-lg p-2 w-full"
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => handleFileChange(e, setFile3)}
-                />
-              </div>
-              <div className="w-full md:w-auto mb-4">
-                <label className="block mb-2">Professor's Shortform</label>
-                <input
-                  className="rounded-lg p-2 w-full"
-                  type="file"
-                  accept=".csv"
-                  onChange={(e) => handleFileChange(e, setFile4)}
-                />
-              </div>
-            </div>
-            <div className="flex">
-              <button
-                className="bg-green-500 justify-center items-center rounded-lg p-2"
-                onClick={printOutput}
-              >
-                Generate Timetable
-              </button>
-              <button
-                className="bg-blue-500 justify-center items-center rounded-lg p-2 ml-2"
-                onClick={printOutput}
-              >
-                Save All Timetables
-              </button>
-              <button
-                className="bg-gray-500 justify-center items-center rounded-lg p-2 ml-2"
-                onClick={() => {
-                  saveTimeTable();
-                }}
-              >
-                Push to DB
-              </button>
-            </div>
-          </div>
-          {Object.keys(timetableData).map((dataa, index) => (
-            <div className="md:mt-12 md:ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
-              <div className="font-black mr-auto ml-2 text-2xl mb-3">
-                {dataa.replace("B_Tech", "B.Tech")}
-              </div>
-              <div className="flex items-center mb-4 rounded-lg px-2">
-                <div className=" flex flex-col items-center rounded-lg">
-                  <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
-                    Slot
-                  </div>
-                  <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
-                    Day
-                  </div>
+      {isLoggedin ? (
+        <div className="flex md:ml-12 p-2">
+          <div className="">
+            <div className="mt-16 font-semibold ml-12 text-4xl">Time Table</div>
+            <div className="bg-white h-0.5 w-1/2 mt-1 ml-12"></div>
+            <div className="m-5 items-center justify-center p-3 ml-10">
+              <div className="mt-8 flex flex-wrap w-full">
+                <div className="w-full md:w-auto mb-4">
+                  <label className="block mb-2">Class to Courses</label>
+                  <input
+                    className="rounded-lg p-2 w-full"
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => handleFileChange(e, setFile1)}
+                  />
                 </div>
-                <div className="flex gap-1">
-                  {index <= 5
-                    ? year1.map((slot, index) => (
-                        <div
-                          key={index}
-                          className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                        >
-                          {slot}
-                        </div>
-                      ))
-                    : [
-                        "8.10-9.00",
-                        "9.00-9.50",
-                        "9.50-10.40",
-                        "break",
-                        "11.00-11.50",
-                        "11.50-12.40",
-                        "Lunch",
-                        "1.40-2.30",
-                        "break",
-                        "2.40-3.30",
-                      ].map((slot, index) => (
-                        <div
-                          key={index}
-                          className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                        >
-                          {slot}
-                        </div>
-                      ))}
+                <div className="w-full md:w-auto mb-4">
+                  <label className="block mb-2">Labs</label>
+                  <input
+                    className="rounded-lg p-2 w-full"
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => handleFileChange(e, setFile2)}
+                  />
+                </div>
+                <div className="w-full md:w-auto mb-4">
+                  <label className="block mb-2">Professors Names</label>
+                  <input
+                    className="rounded-lg p-2 w-full"
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => handleFileChange(e, setFile3)}
+                  />
+                </div>
+                <div className="w-full md:w-auto mb-4">
+                  <label className="block mb-2">Professor's Shortform</label>
+                  <input
+                    className="rounded-lg p-2 w-full"
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => handleFileChange(e, setFile4)}
+                  />
                 </div>
               </div>
               <div className="flex">
-                <div className="flex flex-col gap-1 rounded-lg mr-1">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => (
-                    <div
-                      key={index}
-                      className="w-12 h-8 md:w-24 md:h-16 flex text-[7px] md:text-sm items-center justify-center border bg-[#bfc0c0] rounded-lg"
-                    >
-                      {day}
-                    </div>
-                  ))}
-                </div>
-                <div className="grid grid-rows-5 rounded-lg gap-1 grid-flow-col">
-                  {Array.from({ length: year1.length }).map((_, colIndex) => (
-                    <>
-                      {Array.from({ length: 5 }).map((_, rowIndex) => (
-                        <div
-                          key={colIndex + rowIndex}
-                          className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
-                        >
-                          {timetableData[dataa][rowIndex][colIndex] != "b" &&
-                          timetableData[dataa][rowIndex][colIndex] != "l" ? (
-                            <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                              {timetableData[dataa][rowIndex][colIndex]}
-                            </div>
-                          ) : timetableData[dataa][rowIndex][colIndex] ==
-                            "b" ? (
-                            <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                              Break
-                            </div>
-                          ) : (
-                            <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                              Lunch
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </>
-                  ))}
-                </div>
+                <button
+                  className="bg-green-500 justify-center items-center rounded-lg p-2"
+                  onClick={printOutput}
+                >
+                  Generate Timetable
+                </button>
+                <button
+                  className="bg-blue-500 justify-center items-center rounded-lg p-2 ml-2"
+                  onClick={printOutput}
+                >
+                  Save All Timetables
+                </button>
+                <button
+                  className="bg-gray-500 justify-center items-center rounded-lg p-2 ml-2"
+                  onClick={() => {
+                    saveTimeTable();
+                  }}
+                >
+                  Push to DB
+                </button>
               </div>
-              <button
-                className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
-                onClick={() => {
-                  genPDF(dataa);
-                }}
-              >
-                Save
-              </button>
             </div>
-          ))}
+            {Object.keys(timetableData).map((dataa, index) => (
+              <div className="md:mt-12 md:ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
+                <div className="font-black mr-auto ml-2 text-2xl mb-3">
+                  {dataa.replace("B_Tech", "B.Tech")}
+                </div>
+                <div className="flex items-center mb-4 rounded-lg px-2">
+                  <div className=" flex flex-col items-center rounded-lg">
+                    <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
+                      Slot
+                    </div>
+                    <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
+                      Day
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    {index <= 5
+                      ? year1.map((slot, index) => (
+                          <div
+                            key={index}
+                            className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                          >
+                            {slot}
+                          </div>
+                        ))
+                      : [
+                          "8.10-9.00",
+                          "9.00-9.50",
+                          "9.50-10.40",
+                          "break",
+                          "11.00-11.50",
+                          "11.50-12.40",
+                          "Lunch",
+                          "1.40-2.30",
+                          "break",
+                          "2.40-3.30",
+                        ].map((slot, index) => (
+                          <div
+                            key={index}
+                            className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                          >
+                            {slot}
+                          </div>
+                        ))}
+                  </div>
+                </div>
+                <div className="flex">
+                  <div className="flex flex-col gap-1 rounded-lg mr-1">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => (
+                      <div
+                        key={index}
+                        className="w-12 h-8 md:w-24 md:h-16 flex text-[7px] md:text-sm items-center justify-center border bg-[#bfc0c0] rounded-lg"
+                      >
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-rows-5 rounded-lg gap-1 grid-flow-col">
+                    {Array.from({ length: year1.length }).map((_, colIndex) => (
+                      <>
+                        {Array.from({ length: 5 }).map((_, rowIndex) => (
+                          <div
+                            key={colIndex + rowIndex}
+                            className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
+                          >
+                            {timetableData[dataa][rowIndex][colIndex] != "b" &&
+                            timetableData[dataa][rowIndex][colIndex] != "l" ? (
+                              <div className="text-center w-full h-full items-center justify-center flex font-bold">
+                                {timetableData[dataa][rowIndex][colIndex]}
+                              </div>
+                            ) : timetableData[dataa][rowIndex][colIndex] ==
+                              "b" ? (
+                              <div className="text-center w-full h-full items-center justify-center flex font-bold">
+                                Break
+                              </div>
+                            ) : (
+                              <div className="text-center w-full h-full items-center justify-center flex font-bold">
+                                Lunch
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </>
+                    ))}
+                  </div>
+                </div>
+                <button
+                  className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
+                  onClick={() => {
+                    genPDF(dataa);
+                  }}
+                >
+                  Save
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <></>
+      )}
     </main>
   );
 }

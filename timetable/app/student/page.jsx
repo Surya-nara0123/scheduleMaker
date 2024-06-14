@@ -33,12 +33,13 @@ export default function Home() {
   const [loggedin, setLoggedin] = React.useState(false);
 
   useEffect(() => {
-    const currentUser = pb.authStore.currentUser;
-    if (!currentUser) {
+    console.log(pb.authStore.model.isStudent);
+    const model = pb.authStore.model;
+    if (!model) {
       setLoggedin(false);
     } else {
       setLoggedin(true);
-      if (currentUser.role == "student") {
+      if (model.isStudent == true) {
         setLoggedin(true);
       } else {
         setLoggedin(false);
