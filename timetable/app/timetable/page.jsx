@@ -5,7 +5,7 @@ import React, { use, useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import SVGStar from "../Components/star";
 import { generatePDF } from "./print.jsx";
-import { startProcess } from "./algo.jsx";
+import { startProcess, startProcess1 } from "./algo.jsx";
 import Papa from "papaparse";
 import PocketBase from "pocketbase";
 
@@ -29,6 +29,7 @@ export default function Table() {
   const [file2, setFile2] = useState(null);
   const [file3, setFile3] = useState(null);
   const [file4, setFile4] = useState(null);
+  const [profData, setProfData] = useState([]);
 
   const handleFileChange = (e, setFile) => {
     setFile(e.target.files[0]);
@@ -190,6 +191,9 @@ export default function Table() {
         proffs_names_to_short,
         labs
       );
+      let b = await startProcess1(class_courses, professors, proffs_names_to_short, labs);
+      console.log("a", a);
+      setProfData(b)
       setTimetableData(a);
     } else {
       alert("Please upload all 4 CSV files.");
@@ -293,6 +297,13 @@ export default function Table() {
     const data = {
       timetable: timetableData,
     };
+    console.log(profData);
+    const data1 = {
+      timetable: profData,
+    };
+    const record1 = await pb
+      .collection("timetable")
+      .update("gmivv6jb0cqo2m5", data1);
 
     const record = await pb
       .collection("timetable")
