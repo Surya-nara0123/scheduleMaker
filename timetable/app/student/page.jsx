@@ -30,7 +30,7 @@ export default function Home() {
     setTimetable(record[0].timetable);
   };
 
-  const [loggedin, setLoggedin] = React.useState(false);
+  const [loggedin, setLoggedin] = React.useState(false); 
 
   useEffect(() => {
     // console.log(pb.authStore.model.isStudent);
