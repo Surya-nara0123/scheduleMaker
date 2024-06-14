@@ -12,6 +12,20 @@ function RegistrationPage() {
     const mail = user.email;
     const password = user.password;
     const namee = user.name;
+    let isStudent = false;
+    let isProfessor = false;
+    let isAdmin = false;
+    if (role === "Student") {
+      isStudent = true;
+    }
+    if (role === "Professor") {
+      isProfessor = true;
+    }
+    if (role === "Admin") {
+      isAdmin = true;
+      isProfessor = true;
+      isStudent = true;
+    }
     const data = {
       username: user1,
       email: mail,
@@ -19,6 +33,9 @@ function RegistrationPage() {
       password: password,
       passwordConfirm: password,
       name: namee,
+      isStudent: isStudent,
+      isProfessor: isProfessor,
+      isAdmin: isAdmin,
     };
     try {
       const record = await pb.collection("users").create(data);
@@ -33,6 +50,7 @@ function RegistrationPage() {
     password: "",
     name: "",
   });
+  const [role, setRole] = useState("Student");
   return (
     <main className="flex w-screen h-screen items-center justify-center">
       <Image src={snu02} alt="SNU" layout="fill" objectFit="cover" />
@@ -71,6 +89,16 @@ function RegistrationPage() {
               setUser({ ...user, name: e.target.value });
             }}
           />
+          <select
+            className="m-3 rounded-md p-3"
+            onChange={(e) => {
+              setRole(e.target.value);
+            }}
+          >
+            <option defaultChecked>Student</option>
+            <option>Professor</option>
+            <option>Admin</option>
+          </select>
           <button
             className="mx-auto w-fit m-3 p-3 px-6 bg-white rounded-full"
             onClick={() => {
