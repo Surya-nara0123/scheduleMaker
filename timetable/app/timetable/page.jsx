@@ -302,7 +302,7 @@ export default function Table() {
   const [isLoggedin, setLoggedin] = useState(false);
 
   useEffect(() => {
-    console.log(pb.authStore.model.isStudent);
+    //console.log(pb.authStore.model.isStudent);
     const model = pb.authStore.model;
     if (!model) {
       setLoggedin(false);

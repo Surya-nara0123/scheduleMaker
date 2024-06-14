@@ -112,9 +112,9 @@ const Sidebar = () => {
             <Link
             title="Professor timetable"
               className={`h-fit rounded-r-md w-fit flex sidebar-link ${isActive(
-                "/Professor"
+                "/professor"
               )}`}
-              href="/Professor"
+              href="/professor"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
