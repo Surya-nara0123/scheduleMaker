@@ -15,13 +15,13 @@ export default function Table() {
   const year1 = [
     "8.10-9.00",
     "9.00-9.50",
-    "break",
+    "Break",
     "10.10-11.00",
     "11.00-11.50",
     "Lunch",
     "12.50-1.40",
     "1.40-2.30",
-    "break",
+    "Break",
     "2.40-3.30",
   ];
   const [timetableData, setTimetableData] = useState([]);
@@ -414,12 +414,12 @@ export default function Table() {
                           "8.10-9.00",
                           "9.00-9.50",
                           "9.50-10.40",
-                          "break",
+                          "Break",
                           "11.00-11.50",
                           "11.50-12.40",
                           "Lunch",
                           "1.40-2.30",
-                          "break",
+                          "Break",
                           "2.40-3.30",
                         ].map((slot, index) => (
                           <div
