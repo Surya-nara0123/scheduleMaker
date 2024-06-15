@@ -5,7 +5,7 @@ import React, { use, useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import SVGStar from "../Components/star";
 import { generatePDF } from "./print.jsx";
-import { startProcess, startProcess1 } from "./algo.jsx";
+import { randomize  } from "./algo.jsx";
 import Papa from "papaparse";
 import PocketBase from "pocketbase";
 
@@ -185,18 +185,18 @@ export default function Table() {
           }
         }
       }
-      let result = await startProcess(
+      let tables = await randomize(
         class_courses,
         professors,
         proffs_names_to_short,
         labs
       );
-      if(result == {}){
+      if(tables == {}){
         alert("Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server.")
         return;
       }
-      let a = result[0];
-      let b = result[1];
+      let a = tables[0];
+      let b = tables[1];
       console.log("a", a);
       setProfData(b)
       setTimetableData(a);
