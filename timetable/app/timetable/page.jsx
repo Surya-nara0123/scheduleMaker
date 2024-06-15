@@ -8,7 +8,7 @@ import { generatePDF } from "./print.jsx";
 import { randomize  } from "./algo.jsx";
 import Papa from "papaparse";
 import PocketBase from "pocketbase";
-
+import { Comment } from "../Components/Comment"
 const pb = new PocketBase("https://snuc.pockethost.io");
 
 export default function Table() {
@@ -350,6 +350,7 @@ export default function Table() {
                 </div>
               </div>
               <div className="flex">
+                <Comment />
                 <button
                   className="bg-green-500 justify-center items-center rounded-lg p-2"
                   onClick={printOutput}

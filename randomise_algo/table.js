@@ -796,9 +796,7 @@ function convert_to_string(timetable_classes, proff_to_short, timetable_professo
     }
 }
 
-async function get_timetables(professors, labs, class_courses, proff_to_short) {
-    let fallback = 0;
-    let classes_to_courses = JSON.parse(JSON.stringify(class_courses));
+function initialise(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
     for (let [clas, courses] of Object.entries(classes_to_courses)) {
         for (let course of courses) {
             if (course[2] === "LT") {
@@ -832,7 +830,60 @@ async function get_timetables(professors, labs, class_courses, proff_to_short) {
         }
     }
 
+    for (let [clas, val] of Object.entries(timetable_classes_init)) {
+        for (let i = 0; i < 5; i++) {
+            val.push([]);
+            for (let slot of classes_timings[clas.slice(0, 3)]) {
+                if (slot[2].includes("C")) {
+                    val[i].push("");
+                } else if (slot[2].includes("L")) {
+                    val[i].push("Lunch");
+                }
+            }
+        }
+    }
+
+    for(const lecture of initial_lectures){
+        for(const course in classes_to_courses[lecture[]])
+{
+            if(course[0] == lecture[1]){
+                if(course[2] == "L"){
+                    let free_check = true;
+                    for(let i = 0; i < course[1]; i++){
+                        if(timetable_classes_init[lecture[0]][lecture[3]][lecture[4] + i] != ""){
+                           free_check = false;
+                        }
+                    }
+                } else {
+                    if(timetable_classes_init[lecture[0]][lecture[3]]lecture[4] == "" && isFreeProfessor([classes_timings[lecture[0]]]))
+                }
+            }
+        }
+    }
+}
+
+async function get_timetables(pro0fessors, labs, class_courses, proff_to_short, initial_lectures) {
+    let classes_timings = {
+        "1st": [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "BC"]],
+        "2nd": [[810, 900, "C"], [900, 950, "C"], [950, 1040, "C"], [1040, 1150, "BC"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "BC"]]
+    };
+
+    let classes_to_courses = JSON.parse(JSON.stringify(class_courses));
+    
+    let timetable_professors_init = {};
+    for (let professor of professors) {
+        timetable_professors_init[professor] = [];
+    }
+
+    let timetable_classes_init = {};
+    for (let clas of Object.keys(class_courses)) {
+        timetable_classes_init[clas] = [];
+    }
+
+    initialise(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses)
+
     var check = false
+    let fallback = 0;
     while (!check && fallback < 50) {
         let class_courses_1 = JSON.parse(JSON.stringify(classes_to_courses));
         let class_courses_2 = JSON.parse(JSON.stringify(classes_to_courses));
