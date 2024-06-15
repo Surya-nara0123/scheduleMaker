@@ -30,7 +30,11 @@ export default function Table() {
   const [file3, setFile3] = useState(null);
   const [file4, setFile4] = useState(null);
   const [profData, setProfData] = useState([]);
-
+  const [parameter, setParameter] = useState([]);
+  const [classCourses, setClassCourses] = useState([]);
+  const handleParameterChange = (e) => {
+    setParameter(e.target.value);
+  };
   const handleFileChange = (e, setFile) => {
     setFile(e.target.files[0]);
   };
@@ -200,32 +204,33 @@ export default function Table() {
   };  
 
   const printOutput = async () => {
-    if (!(file1 && file2 && file3 && file4)) {
-      alert("Please upload all 4 CSV files.");
-      return;
-    }
+      if (!(file1 && file2 && file3 && file4)) {
+        alert("Please upload all 4 CSV files.");
+        return;
+      }
 
-    const processFiles = [file1, file2, file3, file4];
-    const results = await parseCSVFiles(processFiles);
+      const processFiles = [file1, file2, file3, file4];
+      const results = await parseCSVFiles(processFiles);
 
-    if (!results) {
-      return;
-    }
+      if (!results) {
+        return;
+      }
 
-    const { class_courses, professors, proffs_names_to_short, labs } = results;
+      const { class_courses, professors, proffs_names_to_short, labs } = results;
 
-    let tables = await randomize(class_courses, professors, proffs_names_to_short, labs);
-    if (Object.keys(tables).length === 0) {
-      alert("Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server.");
-      return;
-    }
-    let a = tables[0];
-    let b = tables[1];
-    console.log("a", a);
-    setProfData(b);
-    setTimetableData(a);
+      let tables = await randomize(class_courses, professors, proffs_names_to_short, labs, parameter);
+      if (Object.keys(tables).length === 0) {
+        alert("Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server.");
+        return;
+      }
+      let a = tables[0];
+      let b = tables[1];
+      console.log("a", a);
+      setProfData(b);
+      setTimetableData(a);
+      setClassCourses(class_courses)
   };
-
+  
   const convertDetails = async (classTitle) => {
     if (!(file1 && file2 && file3 && file4)) {
       alert("Please upload all 4 CSV files.");
@@ -349,8 +354,12 @@ export default function Table() {
                   />
                 </div>
               </div>
+              <div className="py-6">
+                <h1>Paramters (format : <pre>[[class, course code, professor, day, slot], [class, course code, professor, day, slot], [class, course code, professor, day, slot] etc ]</pre>)</h1>
+                <input type="text" id="parameter" placeholder="Parameters" className="p-2 rounded-lg font-mono"></input><button className="rounded-lg border p-2 ml-4 text-white font-mono" onClick={handleParameterChange}>Save Parameter</button>
+              </div>
               <div className="flex">
-                <Comment />
+             
                 <button
                   className="bg-green-500 justify-center items-center rounded-lg p-2"
                   onClick={printOutput}

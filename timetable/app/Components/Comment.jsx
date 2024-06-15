@@ -1,8 +1,10 @@
-export default async function Comment() {
+'use client'
+export function Comment() {
     return(
-        <main className="w-24 h-24">
+        <main className="overflow-x-auto py-6">
             <div>
-                test
+                <h1>Paramters (format : <pre>[[class, course code, professor, day, slot], [class, course code, professor, day, slot], [class, course code, professor, day, slot] etc ]</pre>)</h1>
+                <input type="text" placeholder="Parameters" className="p-2 rounded-lg font-mono"></input>
             </div>
         </main>
     )
