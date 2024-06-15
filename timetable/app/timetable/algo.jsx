@@ -910,30 +910,24 @@ async function get_timetables(professors, labs, class_courses, proff_to_short) {
     return {};
 }
 
-async function randomize(class_courses, professors, proff_to_short, labs) {
+export async function randomize(class_courses, professors, proff_to_short, labs) {
     try {
         const result = await get_timetables(professors, labs, class_courses, proff_to_short);
-        return result[0]
+        return result;
     } catch (error) {
         console.error('Error generating timetables:', error);
+        return {};
     }
 }
 
-export async function  startProcess(class_courses, professors, proff_to_short, labs) {
-    let b = await randomize(class_courses, professors, proff_to_short, labs);
-    return b;
-}
-
-async function randomize1(class_courses, professors, proff_to_short, labs) {
-    try {
-        const result = await get_timetables(professors, labs, class_courses, proff_to_short);
-        return result
-    } catch (error) {
-        console.error('Error generating timetables:', error);
+export function is_free_professor(proffs_tt, proffs_special_casses, proff, clas, day, slot){
+    if(proff in proffs_special_casses){
+        let classes_timings = {
+            "1st": [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "BC"]],
+            "2nd": [[810, 900, "C"], [900, 950, "C"], [950, 1040, "C"], [1040, 1150, "BC"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "BC"]]
+        };
+        return isFreeProfessor([classes_timings[clas.slice(0,3)][slot][0], classes_timings[clas.slice(0,3)][slot][1], day], proffs_special_casses, proff);
     }
-}
 
-export async function  startProcess1(class_courses, professors, proff_to_short, labs) {
-    let b = await randomize1(class_courses, professors, proff_to_short, labs);
-    return b[1];
+    return proffs_tt[proff][day][slot] == ""
 }

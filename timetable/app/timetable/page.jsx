@@ -185,13 +185,18 @@ export default function Table() {
           }
         }
       }
-      let a = await startProcess(
+      let result = await startProcess(
         class_courses,
         professors,
         proffs_names_to_short,
         labs
       );
-      let b = await startProcess1(class_courses, professors, proffs_names_to_short, labs);
+      if(result == {}){
+        alert("Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server.")
+        return;
+      }
+      let a = result[0];
+      let b = result[1];
       console.log("a", a);
       setProfData(b)
       setTimetableData(a);
@@ -200,7 +205,7 @@ export default function Table() {
     }
   };
 
-  const convertDetails = async (data) => {
+  const convertDetails = async (classTitle) => {
     let index = 0;
     const processFiles = [file1, file2, file3, file4];
     let done_files = [];
@@ -267,7 +272,7 @@ export default function Table() {
         }
       }
     }
-    let course = class_courses[data];
+    let course = class_courses[classTitle];
     let profs = professors;
 
     let proffDetails = [];
