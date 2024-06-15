@@ -796,7 +796,7 @@ function convert_to_string(timetable_classes, proff_to_short, timetable_professo
     }
 }
 
-async function initialise(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
+function initialise(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
     for (let [clas, courses] of Object.entries(classes_to_courses)) {
         for (let course of courses) {
             if (course[2] === "LT") {
