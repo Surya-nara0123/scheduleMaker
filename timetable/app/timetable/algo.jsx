@@ -694,8 +694,7 @@ function add_breaks(timetable_classes, classes_timings, timetable_professors) {
                     continue
                 }
                 timetable_classes[clas][day].splice(index, 0, "Break");
-                index += 1
-                index += 1
+                index += 2
             }
         }
     }
