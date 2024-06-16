@@ -800,7 +800,7 @@ function convert_to_string(timetable_classes, proff_to_short, timetable_professo
     }
 }
 
-function initialise(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
+function initialise_class_courses(classes_to_courses){
     for (let [clas, courses] of Object.entries(classes_to_courses)) {
         for (let course of courses) {
             if (course[2] === "LT") {
@@ -846,7 +846,9 @@ function initialise(timetable_classes_init, timetable_professors_init, classes_t
             }
         }
     }
+}
 
+function initialise_static_lectures(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
     let temp = JSON.parse(JSON.stringify(initial_lectures))
 
     for(const lecture of initial_lectures){
@@ -885,7 +887,10 @@ async function get_timetables(class_courses, professors, proff_to_short, labs, i
         timetable_classes_init[clas] = [];
     }
 
-    initialise(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses);
+    initialise_class_courses(classes_to_courses);
+    let backup = JSON.parse(JSON.stringify(class_courses));
+    
+    initialise_static_lectures(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses);
 
     if(initial_lectures == []){
         return {}
@@ -895,7 +900,7 @@ async function get_timetables(class_courses, professors, proff_to_short, labs, i
     let fallback = 0;
     while (!check && fallback < 50) {
         let class_courses_1 = JSON.parse(JSON.stringify(classes_to_courses));
-        let class_courses_2 = JSON.parse(JSON.stringify(classes_to_courses));
+        let class_courses_2 = JSON.parse(JSON.stringify(backup));
 
         let lab_classes = {};
         for (let [clas, courses] of Object.entries(class_courses_1)) {
