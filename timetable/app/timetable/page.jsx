@@ -221,7 +221,7 @@ export default function Table() {
 
     const { class_courses, professors, proffs_names_to_short, labs } = results;
 
-    let tables = await randomize(
+    let tables = randomize(
       class_courses,
       professors,
       proffs_names_to_short,
