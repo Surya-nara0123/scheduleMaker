@@ -13,8 +13,8 @@ function make_random() {
 
 const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-function isEmptyLabs(labClasses) {
-    for (const k of Object.values(labClasses)) {
+function isEmptyLabs(lab_classes) {
+    for (const k of Object.values(lab_classes)) {
         if (k.length !== 0) {
             return false;
         }
@@ -22,16 +22,16 @@ function isEmptyLabs(labClasses) {
     return true;
 }
 
-function freeLabs(courseCode, timing, timetableLabs) {
+function freeLabs(courseCode, timing, timetable_labs) {
     const usable = [];
-    for (const lab of Object.keys(timetableLabs)) {
+    for (const lab of Object.keys(timetable_labs)) {
         if (lab.startsWith(courseCode.slice(0, 3))) {
             usable.push(lab);
         }
     }
     const temp = [...usable];
     for (const lab of usable) {
-        for (const usage of timetableLabs[lab]) {
+        for (const usage of timetable_labs[lab]) {
             if (usage[0][2] !== timing[2]) {
                 continue;
             }
@@ -52,8 +52,8 @@ function freeLabs(courseCode, timing, timetableLabs) {
     return temp;
 }
 
-function isFreeProfessor(timing, timetableProfessors, professor) {
-    for (const classes of timetableProfessors[professor]) {
+function isFreeProfessor(timing, timetable_professors, professor) {
+    for (const classes of timetable_professors[professor]) {
         if (classes[0][2] !== timing[2]) {
             continue;
         }
@@ -70,11 +70,11 @@ function isFreeProfessor(timing, timetableProfessors, professor) {
     return true;
 }
 
-function checkProfessor(course, clas, timing, timetableProfessors, professor) {
-    for (const lecture of timetableProfessors[professor]) {
+function checkProfessor(course, clas, timing, timetable_professors, professor) {
+    for (const lecture of timetable_professors[professor]) {
         if (lecture[1] === clas && lecture[2] === course && lecture[0][0] <= timing[0] && lecture[0][1] >= timing[1] && lecture[0][2] === timing[2]) {
             if (lecture[0][1] === timing[1]) {
-                timetableProfessors[professor].splice(timetableProfessors[professor].indexOf(lecture), 1);
+                timetable_professors[professor].splice(timetable_professors[professor].indexOf(lecture), 1);
             }
             return true;
         }
@@ -82,11 +82,11 @@ function checkProfessor(course, clas, timing, timetableProfessors, professor) {
     return false;
 }
 
-function checkLab(course, clas, timing, timetableLabs, lab) {
-    for (const usage of timetableLabs[lab]) {
+function checkLab(course, clas, timing, timetable_labs, lab) {
+    for (const usage of timetable_labs[lab]) {
         if (usage[1] === clas && usage[2] === course && usage[0][0] <= timing[0] && usage[0][1] >= timing[1] && usage[0][2] === timing[2]) {
             if (usage[0][1] === timing[1]) {
-                timetableLabs[lab].splice(timetableLabs[lab].indexOf(usage), 1);
+                timetable_labs[lab].splice(timetable_labs[lab].indexOf(usage), 1);
             }
             return true;
         }
