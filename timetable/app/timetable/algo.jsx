@@ -108,7 +108,8 @@ function labs_insert(lab_classes, timetable_classes, timetable_professors, timet
                     continue;
                 }
                 var possible_labs = {};
-                for (const lab_course in lab_classes[clas]) {
+                for (var _a = 0, _b = lab_classes[clas]; _a < _b.length; _a++) {
+                    var lab_course = _b[_a];
                     var check = true;
                     for (var i = 0; i < lab_course[1]; i++) {
                         if (((slot + i) >= timetable_classes[clas][day].length) || timetable_classes[clas][day][slot + i] != "" || !isFreeProfessor([classes_timings[clas.slice(0, 3)][slot + i][0], classes_timings[clas.slice(0, 3)][slot + i][1], day], timetable_professors, lab_course[3])) {
@@ -835,6 +836,7 @@ function initialise_class_courses(classes_to_courses){
             }
         }
     }
+    return classes_to_courses
 }
 
 function initialise_class_timetable(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
@@ -852,14 +854,15 @@ function initialise_class_timetable(timetable_classes_init, timetable_professors
     }
 
     let temp = JSON.parse(JSON.stringify(initial_lectures))
-
-    for(const lecture of initial_lectures){
+    console.log(temp)
+    for(const lecture of temp){
+        console.log(lecture)
         for(const course in classes_to_courses[lecture[0]]){
             if(course[0] == lecture[1] && course[2] == "T"){
                 if(timetable_classes_init[lecture[0]][lecture[3]][lecture[4]] == "" && isFreeProfessor([classes_timings[lecture[0].slice(0,3)][lecture[4]][0], classes_timings[lecture[0].slice(0,3)][lecture[4]][1], day], timetable_professors_init, lecture[2])){
                     timetable_classes_init[lecture[0]][lecture[3]][lecture[4]] = [lecture[1], lecture[2]];
                     timetable_professors_init[lecture[2]].push([classes_timings[lecture[0].slice(0,3)][lecture[4]][0], classes_timings[lecture[0].slice(0,3)][lecture[4]][1], day], lecture[0], lecture[1])
-                    temp.splice(temp.indexOf(lecture), 1);
+                    initial_lectures.splice(initial_lectures.indexOf(lecture), 1);
                 }
                 course[1] -= 1
                 if(course[1] == 0){
@@ -868,10 +871,10 @@ function initialise_class_timetable(timetable_classes_init, timetable_professors
             }
         }
     }
-    initial_lectures = JSON.parse(JSON.stringify(temp));
 }
 
 async function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures) {
+    console.log(initial_lectures)
     let classes_timings = {
         "1st": [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "BC"]],
         "2nd": [[810, 900, "C"], [900, 950, "C"], [950, 1040, "C"], [1040, 1150, "BC"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "BC"]]
@@ -889,14 +892,11 @@ async function get_timetables(class_courses, professors, proff_to_short, labs, i
         timetable_classes_init[clas] = [];
     }
 
-    initialise_class_courses(classes_to_courses);
-    let backup = JSON.parse(JSON.stringify(class_courses));
+    let temp = initialise_class_courses(classes_to_courses);
+    classes_to_courses = JSON.parse(JSON.stringify(temp))
+    let backup = JSON.parse(JSON.stringify(classes_to_courses));
     
-    initialise_class_timetable(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses);
-
-    if(initial_lectures == []){
-        return {}
-    }
+    initialise_class_timetable(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses)
 
     var check = false
     let fallback = 0;
@@ -906,7 +906,8 @@ async function get_timetables(class_courses, professors, proff_to_short, labs, i
 
         let lab_classes = {};
         for (let [clas, courses] of Object.entries(class_courses_1)) {
-            lab_classes[clas] = courses.filter(course => course[2] === "L");
+            let labCourses = courses.filter(course => course[2] === "L");
+            lab_classes[clas] = JSON.parse(JSON.stringify(labCourses));
         }
 
         let theory_classes = {};
@@ -915,19 +916,19 @@ async function get_timetables(class_courses, professors, proff_to_short, labs, i
         }
 
         let timetable_professors = JSON.parse(JSON.stringify(timetable_professors_init));
-
         let timetable_classes = JSON.parse(JSON.stringify(timetable_classes_init));
 
         let timetable_labs = {};
         for (let lab of labs) {
             timetable_labs[lab] = [];
         }
-
+        
         let counter = 0;
         while (!isEmptyLabs(lab_classes) && counter < 10) {
             labs_insert(lab_classes, timetable_classes, timetable_professors, timetable_labs, classes_timings);
             counter += 1;
         }
+
         theory_insert(theory_classes, timetable_classes, timetable_professors, classes_timings);
         theory_update(theory_classes, timetable_classes, timetable_professors, classes_timings);
 
@@ -935,6 +936,8 @@ async function get_timetables(class_courses, professors, proff_to_short, labs, i
         let labs_temp = JSON.parse(JSON.stringify(timetable_labs));
 
         check = verifyEverything(classes_timings, timetable_classes, timetable_professors, timetable_labs, class_courses_2)
+
+        console.log("Is it here?");
 
         if (check) {
             let proffs_dicts = format_professors(proffs_temp, classes_timings, timetable_classes);
@@ -950,7 +953,8 @@ async function get_timetables(class_courses, professors, proff_to_short, labs, i
 
 export async function randomize(class_courses, professors, proff_to_short, labs, initial_lectures) {
     try {
-        const result = await get_timetables(professors, labs, class_courses, proff_to_short, initial_lectures);
+        console.log(initial_lectures)
+        const result = await get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures);
         return result;
     } catch (error) {
         console.error('Error generating timetables:', error);
