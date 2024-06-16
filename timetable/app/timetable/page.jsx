@@ -5,10 +5,10 @@ import React, { use, useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import SVGStar from "../Components/star";
 import { generatePDF } from "./print.jsx";
-import { randomize  } from "./algo.jsx";
+import { randomize } from "./algo.jsx";
 import Papa from "papaparse";
 import PocketBase from "pocketbase";
-import { Comment } from "../Components/Comment"
+import { Comment } from "../Components/Comment";
 const pb = new PocketBase("https://snuc.pockethost.io");
 
 export default function Table() {
@@ -124,18 +124,18 @@ export default function Table() {
   const parseCSVFiles = async (files) => {
     let done_files = new Set();
     let results = [];
-    
+
     for (let index = 0; index < files.length; index++) {
       const file = files[index];
       const file_name = file.name;
-  
+
       if (done_files.has(file_name)) {
         alert("Repeating Files!!");
         return null;
       } else {
         done_files.add(file_name);
       }
-  
+
       const result = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -146,7 +146,7 @@ export default function Table() {
             complete: (results) => {
               const data = results.data;
               let dictionary = {};
-  
+
               switch (index) {
                 case 0:
                   dictionary = createDictionary_class(data);
@@ -163,26 +163,29 @@ export default function Table() {
                 default:
                   reject(new Error("Invalid index"));
               }
-  
+
               resolve(dictionary);
             },
           });
         };
         reader.readAsText(file);
       });
-  
-      if ((Array.isArray(result) && result.length === 0) || Object.keys(result).length === 0) {
+
+      if (
+        (Array.isArray(result) && result.length === 0) ||
+        Object.keys(result).length === 0
+      ) {
         alert("Improper File = " + file_name);
         return null;
       }
       results.push(result);
     }
-  
+
     let class_courses = {};
     let professors = [];
     let proffs_names_to_short = {};
     let labs = [];
-  
+
     results.forEach((thing) => {
       if (typeof thing === "object" && !Array.isArray(thing)) {
         let keys = Object.keys(thing);
@@ -199,38 +202,46 @@ export default function Table() {
         }
       }
     });
-  
+
     return { class_courses, professors, proffs_names_to_short, labs };
-  };  
+  };
 
   const printOutput = async () => {
-      if (!(file1 && file2 && file3 && file4)) {
-        alert("Please upload all 4 CSV files.");
-        return;
-      }
+    if (!(file1 && file2 && file3 && file4)) {
+      alert("Please upload all 4 CSV files.");
+      return;
+    }
 
-      const processFiles = [file1, file2, file3, file4];
-      const results = await parseCSVFiles(processFiles);
+    const processFiles = [file1, file2, file3, file4];
+    const results = await parseCSVFiles(processFiles);
 
-      if (!results) {
-        return;
-      }
+    if (!results) {
+      return;
+    }
 
-      const { class_courses, professors, proffs_names_to_short, labs } = results;
+    const { class_courses, professors, proffs_names_to_short, labs } = results;
 
-      let tables = await randomize(class_courses, professors, proffs_names_to_short, labs, parameter);
-      if (Object.keys(tables).length === 0) {
-        alert("Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server.");
-        return;
-      }
-      let a = tables[0];
-      let b = tables[1];
-      console.log("a", a);
-      setProfData(b);
-      setTimetableData(a);
-      setClassCourses(class_courses)
+    let tables = await randomize(
+      class_courses,
+      professors,
+      proffs_names_to_short,
+      labs,
+      parameter
+    );
+    if (Object.keys(tables).length === 0) {
+      alert(
+        "Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server."
+      );
+      return;
+    }
+    let a = tables[0];
+    let b = tables[1];
+    console.log("a", a);
+    setProfData(b);
+    setTimetableData(a);
+    setClassCourses(class_courses);
   };
-  
+
   const convertDetails = async (classTitle) => {
     if (!(file1 && file2 && file3 && file4)) {
       alert("Please upload all 4 CSV files.");
@@ -239,17 +250,17 @@ export default function Table() {
 
     const processFiles = [file1, file2, file3, file4];
     const results = await parseCSVFiles(processFiles);
-  
+
     if (!results) {
       return;
     }
-  
+
     const { class_courses, professors, proffs_names_to_short, labs } = results;
-  
+
     let course = class_courses[classTitle];
     let profs = professors;
     let proffDetails = [];
-  
+
     for (let i = 0; i < course.length; i++) {
       let temp = {};
       temp[course[i][0]] = [
@@ -263,7 +274,7 @@ export default function Table() {
     }
     console.log(proffDetails);
     return proffDetails;
-  };  
+  };
 
   const genPDF = async (classTitle) => {
     let temp = {};
@@ -271,7 +282,7 @@ export default function Table() {
     temp[classTitle] = timetableData[classTitle];
     await generatePDF(temp, a);
   };
-  
+
   const saveTimeTable = async () => {
     console.log(timetableData);
     const data = {
@@ -355,11 +366,29 @@ export default function Table() {
                 </div>
               </div>
               <div className="py-6">
-                <h1>Paramters (format : <pre>[[class, course code, professor, day, slot], [class, course code, professor, day, slot], [class, course code, professor, day, slot] etc ]</pre>)</h1>
-                <input type="text" id="parameter" placeholder="Parameters" className="p-2 rounded-lg font-mono"></input><button className="rounded-lg border p-2 ml-4 text-white font-mono" onClick={handleParameterChange}>Save Parameter</button>
+                <h1>
+                  Paramters (format :{" "}
+                  <pre>
+                    [[class, course code, professor, day, slot], [class, course
+                    code, professor, day, slot], [class, course code, professor,
+                    day, slot] etc ]
+                  </pre>
+                  )
+                </h1>
+                <input
+                  type="text"
+                  id="parameter"
+                  placeholder="Parameters"
+                  className="p-2 rounded-lg font-mono"
+                ></input>
+                <button
+                  className="rounded-lg border p-2 ml-4 text-white font-mono"
+                  onClick={handleParameterChange}
+                >
+                  Save Parameter
+                </button>
               </div>
               <div className="flex">
-             
                 <button
                   className="bg-green-500 justify-center items-center rounded-lg p-2"
                   onClick={printOutput}

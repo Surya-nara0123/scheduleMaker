@@ -97,8 +97,8 @@ function checkLab(course, clas, timing, timetable_labs, lab) {
 function labs_insert(lab_classes, timetable_classes, timetable_professors, timetable_labs, classes_timings) {
     var classes = Object.keys(lab_classes);
     classes.sort(function () { return 0.5 - Math.random() });
-    for (var _i = 0, classes_1 = classes; _i < classes_1.length; _i++) {
-        var clas = classes_1[_i];
+    for (var i = 0; i < classes.length; i++) {
+        var clas = classes[i];
         if (lab_classes[clas] == []) {
             continue;
         }
@@ -108,29 +108,31 @@ function labs_insert(lab_classes, timetable_classes, timetable_professors, timet
                     continue;
                 }
                 var possible_labs = {};
-                for (var _a = 0, _b = lab_classes[clas]; _a < _b.length; _a++) {
-                    var x = _b[_a];
+                for (const lab_course in lab_classes[clas]) {
                     var check = true;
-                    for (var i = 0; i < x[1]; i++) {
-                        if (((slot + i) >= timetable_classes[clas][day].length) || timetable_classes[clas][day][slot + i] != "" || !isFreeProfessor([classes_timings[clas.slice(0, 3)][slot + i][0], classes_timings[clas.slice(0, 3)][slot + i][1], day], timetable_professors, x[3])) {
+                    for (var i = 0; i < lab_course[1]; i++) {
+                        if (((slot + i) >= timetable_classes[clas][day].length) || timetable_classes[clas][day][slot + i] != "" || !isFreeProfessor([classes_timings[clas.slice(0, 3)][slot + i][0], classes_timings[clas.slice(0, 3)][slot + i][1], day], timetable_professors, lab_course[3])) {
                             check = false;
                         }
                     }
                     if (check == false) {
                         continue;
                     }
-                    var temp = freeLabs(x[0], [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot + (x[1] - 1)][1], day], timetable_labs);
+                    var temp = freeLabs(lab_course[0], [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot + (lab_course[1] - 1)][1], day], timetable_labs);
                     if (temp.length === 0) {
                         continue;
                     }
-                    possible_labs[x[0]] = temp;
+                    possible_labs[lab_course[0]] = temp;
                 }
                 if (Object.keys(possible_labs).length === 0) {
                     continue;
                 }
+
+                //To introduce randomness in lab classes placement.
                 if (make_random() % 5 != 0) {
                     continue;
                 }
+                
                 var options = Object.keys(possible_labs);
                 var choice = options[make_random() % options.length];
                 if (((choice == "PHY102") && (options.includes("CSE102"))) || ((choice == "CSE102") && (options.includes("PHY102")))) {
