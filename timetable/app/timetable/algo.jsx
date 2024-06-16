@@ -833,7 +833,9 @@ function initialise_class_courses(classes_to_courses){
             }
         }
     }
+}
 
+function initialise_class_timetable(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
     for (let [clas, val] of Object.entries(timetable_classes_init)) {
         for (let i = 0; i < 5; i++) {
             val.push([]);
@@ -846,9 +848,7 @@ function initialise_class_courses(classes_to_courses){
             }
         }
     }
-}
 
-function initialise_static_lectures(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
     let temp = JSON.parse(JSON.stringify(initial_lectures))
 
     for(const lecture of initial_lectures){
@@ -890,7 +890,7 @@ async function get_timetables(class_courses, professors, proff_to_short, labs, i
     initialise_class_courses(classes_to_courses);
     let backup = JSON.parse(JSON.stringify(class_courses));
     
-    initialise_static_lectures(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses);
+    initialise_class_timetable(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses);
 
     if(initial_lectures == []){
         return {}
