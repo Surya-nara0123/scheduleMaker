@@ -396,25 +396,25 @@ function theory_insert(theory_classes, timetable_classes, timetable_professors, 
     }
 }
 
-function theory_update(theoryClasses, timetableClasses, timetableProfessors, classesTimings) {
-    for (const clas in theoryClasses) {
-        if (theoryClasses[clas].length === 0) {
+function theory_update(theory_classes, timetable_classes, timetable_professors, classes_timings) {
+    for (const clas in theory_classes) {
+        if (theory_classes[clas].length === 0) {
             continue;
         } else {
-            for (let day = 0; day < timetableClasses[clas].length; day++) {
-                for (let slot = 0; slot < timetableClasses[clas][day].length; slot++) {
-                    if (theoryClasses[clas].length === 0) {
+            for (let day = 0; day < timetable_classes[clas].length; day++) {
+                for (let slot = 0; slot < timetable_classes[clas][day].length; slot++) {
+                    if (theory_classes[clas].length === 0) {
                         continue;
                     }
 
-                    if (typeof timetableClasses[clas][day][slot] === typeof "Lunch") {
+                    if (typeof timetable_classes[clas][day][slot] === typeof "Lunch") {
                         continue;
                     }
 
-                    if (timetableClasses[clas][day][slot][0].includes("Self-Learning")) {
+                    if (timetable_classes[clas][day][slot][0].includes("Self-Learning")) {
                         const possibles = [];
-                        for (const x of theoryClasses[clas]) {
-                            if (isFreeProfessor([classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableProfessors, x[3])) {
+                        for (const x of theory_classes[clas]) {
+                            if (isFreeProfessor([classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, x[3])) {
                                 possibles.push(x);
                             }
                         }
@@ -423,10 +423,10 @@ function theory_update(theoryClasses, timetableClasses, timetableProfessors, cla
                         }
 
                         let replaced_check = false
-                        for (let i = 0; i < timetableClasses[clas].length; i++) {
-                            for (let j = 0; j < timetableClasses[clas][i].length; j++) {
-                                if (timetableClasses[clas][i][j] === "" && !replaced_check) {
-                                    timetableClasses[clas][i][j] = timetableClasses[clas][day][slot];
+                        for (let i = 0; i < timetable_classes[clas].length; i++) {
+                            for (let j = 0; j < timetable_classes[clas][i].length; j++) {
+                                if (timetable_classes[clas][i][j] === "" && !replaced_check) {
+                                    timetable_classes[clas][i][j] = timetable_classes[clas][day][slot];
                                     replaced_check = true
                                     break;
                                 }
@@ -434,13 +434,13 @@ function theory_update(theoryClasses, timetableClasses, timetableProfessors, cla
                         }
 
                         const choice = possibles[make_random() % possibles.length];
-                        timetableClasses[clas][day][slot] = [choice[0], choice[3]];
-                        timetableProfessors[choice[3]].push([[classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], clas, choice[0]]);
-                        for (const i of theoryClasses[clas]) {
+                        timetable_classes[clas][day][slot] = [choice[0], choice[3]];
+                        timetable_professors[choice[3]].push([[classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], clas, choice[0]]);
+                        for (const i of theory_classes[clas]) {
                             if (i[0] === choice[0]) {
                                 i[1] -= 1;
                                 if (i[1] === 0) {
-                                    theoryClasses[clas] = theoryClasses[clas].filter(item => item !== i);
+                                    theory_classes[clas] = theory_classes[clas].filter(item => item !== i);
                                 }
                             }
                         }
@@ -450,13 +450,13 @@ function theory_update(theoryClasses, timetableClasses, timetableProfessors, cla
         }
     }
 
-    for (const clas in timetableClasses) {
-        for (let day = 0; day < timetableClasses[clas].length; day++) {
-            for (let slot = 0; slot < timetableClasses[clas][day].length; slot++) {
-                if (timetableClasses[clas][day][slot] === "") {
-                    for (let i of theoryClasses[clas]) {
+    for (const clas in timetable_classes) {
+        for (let day = 0; day < timetable_classes[clas].length; day++) {
+            for (let slot = 0; slot < timetable_classes[clas][day].length; slot++) {
+                if (timetable_classes[clas][day][slot] === "") {
+                    for (let i of theory_classes[clas]) {
                         if (i[0].includes("Self-Learning")) {
-                            timetableClasses[clas][day][slot] = [i[0], i[3]];
+                            timetable_classes[clas][day][slot] = [i[0], i[3]];
                             theory_classes[clas].splice(theory_classes[clas].indexOf(i), 1);
                             break;
                         }
@@ -467,20 +467,20 @@ function theory_update(theoryClasses, timetableClasses, timetableProfessors, cla
     }
 }
 
-function verifyEverything(classesTimings, timetableClasses, timetableProfessors, timetableLabs, backup) {
-    for (const clas in timetableClasses) {
-        for (let day = 0; day < timetableClasses[clas].length; day++) {
+function verifyEverything(classes_timings, timetable_classes, timetable_professors, timetable_labs, backup) {
+    for (const clas in timetable_classes) {
+        for (let day = 0; day < timetable_classes[clas].length; day++) {
             let selfCount = 0;
-            for (let slot = 0; slot < timetableClasses[clas][day].length; slot++) {
-                if (timetableClasses[clas][day][slot] === "") {
+            for (let slot = 0; slot < timetable_classes[clas][day].length; slot++) {
+                if (timetable_classes[clas][day][slot] === "") {
                     return false;
                 }
 
-                if (timetableClasses[clas][day][slot] === "Lunch") {
+                if (timetable_classes[clas][day][slot] === "Lunch") {
                     continue;
                 }
 
-                const temp = timetableClasses[clas][day][slot];
+                const temp = timetable_classes[clas][day][slot];
                 const leftCourses = backup[clas].map(course => course[0]);
                 if (!leftCourses.includes(temp[0])) {
                     return false;
@@ -504,7 +504,7 @@ function verifyEverything(classesTimings, timetableClasses, timetableProfessors,
                         continue;
                     }
 
-                    if (!checkProfessor(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableProfessors, temp[1])) {
+                    if (!checkProfessor(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, temp[1])) {
                         return false;
                     }
                     for (const course of backup[clas]) {
@@ -521,11 +521,11 @@ function verifyEverything(classesTimings, timetableClasses, timetableProfessors,
 
                 if (temp.includes("CSE102")) {
                     if (clas.includes("IoT")) {
-                        if (!(checkLab(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableLabs, temp[1]) && checkLab(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableLabs, temp[2]))) {
+                        if (!(checkLab(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_labs, temp[1]) && checkLab(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_labs, temp[2]))) {
                             return false;
                         }
 
-                        if (!checkProfessor(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableProfessors, temp[3])) {
+                        if (!checkProfessor(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, temp[3])) {
                             return false;
                         }
 
@@ -540,11 +540,11 @@ function verifyEverything(classesTimings, timetableClasses, timetableProfessors,
                         }
                         continue;
                     }
-                    if (!(checkLab(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableLabs, temp[2]) && checkLab(temp[1], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableLabs, temp[3]))) {
+                    if (!(checkLab(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_labs, temp[2]) && checkLab(temp[1], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_labs, temp[3]))) {
                         return false;
                     }
 
-                    if (!(checkProfessor(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableProfessors, temp[4]) && checkProfessor(temp[1], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableProfessors, temp[5]))) {
+                    if (!(checkProfessor(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, temp[4]) && checkProfessor(temp[1], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, temp[5]))) {
                         return false;
                     }
 
@@ -568,11 +568,11 @@ function verifyEverything(classesTimings, timetableClasses, timetableProfessors,
                         }
                     }
                 } else if (temp[0].includes("ECE")) {
-                    if (!checkLab(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableLabs, temp[1])) {
+                    if (!checkLab(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_labs, temp[1])) {
                         return false;
                     }
 
-                    if (!checkProfessor(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableProfessors, temp[2])) {
+                    if (!checkProfessor(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, temp[2])) {
                         return false;
                     }
 
@@ -586,11 +586,11 @@ function verifyEverything(classesTimings, timetableClasses, timetableProfessors,
                         }
                     }
                 } else {
-                    if (!(checkLab(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableLabs, temp[1]) && checkLab(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableLabs, temp[2]))) {
+                    if (!(checkLab(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_labs, temp[1]) && checkLab(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_labs, temp[2]))) {
                         return false;
                     }
 
-                    if (!checkProfessor(temp[0], clas, [classesTimings[clas.slice(0, 3)][slot][0], classesTimings[clas.slice(0, 3)][slot][1], day], timetableProfessors, temp[3])) {
+                    if (!checkProfessor(temp[0], clas, [classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, temp[3])) {
                         return false;
                     }
 
@@ -608,7 +608,7 @@ function verifyEverything(classesTimings, timetableClasses, timetableProfessors,
         }
     }
 
-    for (const [lab, usages] of Object.entries(timetableLabs)) {
+    for (const [lab, usages] of Object.entries(timetable_labs)) {
         if (usages.length !== 0) {
             for (const usage of usages) {
                 return false;
@@ -616,7 +616,7 @@ function verifyEverything(classesTimings, timetableClasses, timetableProfessors,
         }
     }
 
-    for (const [proff, lectures] of Object.entries(timetableProfessors)) {
+    for (const [proff, lectures] of Object.entries(timetable_professors)) {
         if (lectures.length !== 0) {
             for (const lecture of lectures) {
                 return false;
