@@ -609,22 +609,17 @@ function verifyEverything(classes_timings, timetable_classes, timetable_professo
             }
         }
     }
-    for (const [lab, usages] of Object.entries(timetable_labs)) {
+    for (const usages of Object.values(timetable_labs)) {
         if (usages.length !== 0) {
-            for (const usage of usages) {
-                return false;
-            }
+            return false;
         }
     }
 
-    for (const [proff, lectures] of Object.entries(timetable_professors)) {
+    for (const lectures of Object.values(timetable_professors)) {
         if (lectures.length !== 0) {
-            for (const lecture of lectures) {
-                return false;
-            }
+            return false;
         }
     }
-
     return true
 }
 
@@ -853,16 +848,17 @@ function initialise_class_timetable(timetable_classes_init, timetable_professors
 
     let temp = JSON.parse(JSON.stringify(initial_lectures))
     for(const lecture of temp){
-        for(const course in classes_to_courses[lecture[0]]){
-            if(course[0] == lecture[1] && course[2] == "T"){
-                if(timetable_classes_init[lecture[0]][lecture[3]][lecture[4]] == "" && isFreeProfessor([classes_timings[lecture[0].slice(0,3)][lecture[4]][0], classes_timings[lecture[0].slice(0,3)][lecture[4]][1], day], timetable_professors_init, lecture[2])){
+        for(const course of classes_to_courses[lecture[0]]){
+            if(course[0] == lecture[1] && course[2] == "T" && course[3] == lecture[2]){
+                if(timetable_classes_init[lecture[0]][lecture[3]][lecture[4]] == "" && isFreeProfessor([classes_timings[lecture[0].slice(0,3)][lecture[4]][0], classes_timings[lecture[0].slice(0,3)][lecture[4]][1], lecture[3]], timetable_professors_init, lecture[2])){
                     timetable_classes_init[lecture[0]][lecture[3]][lecture[4]] = [lecture[1], lecture[2]];
-                    timetable_professors_init[lecture[2]].push([classes_timings[lecture[0].slice(0,3)][lecture[4]][0], classes_timings[lecture[0].slice(0,3)][lecture[4]][1], day], lecture[0], lecture[1])
+                    timetable_professors_init[lecture[2]].push([[classes_timings[lecture[0].slice(0,3)][lecture[4]][0], classes_timings[lecture[0].slice(0,3)][lecture[4]][1], lecture[3]], lecture[0], lecture[1]])
                     initial_lectures.splice(initial_lectures.indexOf(lecture), 1);
-                }
-                course[1] -= 1
-                if(course[1] == 0){
-                    classes_to_courses[lecture[0]].splice(classes_to_courses[lecture[0]].indexOf(course), 1);
+                    course[1] -= 1
+                    if(course[1] == 0){
+                        classes_to_courses[lecture[0]].splice(classes_to_courses[lecture[0]].indexOf(course), 1);
+                    }
+                    break
                 }
             }
         }
@@ -892,7 +888,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
     let backup = JSON.parse(JSON.stringify(classes_to_courses));
     
     initialise_class_timetable(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses)
-
+    
     let check = false
     let fallback = 0;
     while (!check && fallback < 50) {
