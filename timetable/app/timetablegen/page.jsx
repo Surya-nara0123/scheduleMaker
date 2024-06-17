@@ -1,9 +1,9 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar.tsx";
 import { generatePDF } from "./print.jsx";
-import { randomize } from "./algo.jsx";
+import { randomize } from "./algo.ts";
 import Papa from "papaparse";
 import PocketBase from "pocketbase";
 
@@ -23,6 +23,9 @@ export default function Table() {
     "2.40-3.30",
   ];
 
+  const [table, setTable] = useState(null);
+  const [isGenerated, setIsGenerated] = useState(false);
+
   const [timetableData, setTimetableData] = useState([]);
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
@@ -30,12 +33,11 @@ export default function Table() {
   const [file4, setFile4] = useState(null);
   const [profData, setProfData] = useState([]);
   const [parameter, setParameter] = useState([]);
-  const [classCourses, setClassCourses] = useState([]);
 
   const handleParameterChange = (e) => {
     setParameter(e.target.value);
   };
-  
+
   const handleFileChange = (e, setFile) => {
     setFile(e.target.files[0]);
   };
@@ -227,20 +229,25 @@ export default function Table() {
       professors,
       proffs_names_to_short,
       labs,
-      parameter
+      parameter,
     );
     if (Object.keys(tables).length === 0) {
       alert(
-        "Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server."
+        "Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server.",
       );
       return;
     }
     let a = tables[0];
     let b = tables[1];
-    console.log("a", a);
+    setTable(a);
+
+    console.log("a: ", a);
+    console.log("b: ", b);
+
     setProfData(b);
     setTimetableData(a);
-    setClassCourses(class_courses);
+
+    setIsGenerated(true);
   };
 
   const convertDetails = async (classTitle) => {
@@ -259,7 +266,6 @@ export default function Table() {
     const { class_courses, professors, proffs_names_to_short, labs } = results;
 
     let course = class_courses[classTitle];
-    let profs = professors;
     let proffDetails = [];
 
     for (let i = 0; i < course.length; i++) {
@@ -286,20 +292,7 @@ export default function Table() {
 
   const saveTimeTable = async () => {
     console.log(timetableData);
-    const data = {
-      timetable: timetableData,
-    };
     console.log(profData);
-    const data1 = {
-      timetable: profData,
-    };
-    const record1 = await pb
-      .collection("timetable")
-      .update("gmivv6jb0cqo2m5", data1);
-
-    const record = await pb
-      .collection("timetable")
-      .update("wizw6h9iga918ub", data);
   };
 
   const [isLoggedin, setLoggedin] = useState(false);
@@ -307,7 +300,6 @@ export default function Table() {
   const [currentSection, setCurrentSection] = useState("AIDS Section A");
 
   useEffect(() => {
-    //console.log(pb.authStore.model.isStudent);
     const model = pb.authStore.model;
     if (!model) {
       setLoggedin(false);
@@ -417,217 +409,240 @@ export default function Table() {
                 </button>
               </div>
             </div>
-            <div>
-              <div className="flex ml-12 font-mono mt-3">
-                {currentYear == "1st Year" ? (
-                  <div
-                    className={
-                      "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                    }
-                    onClick={() => setCurrentYear("1st Year")}
-                  >
-                    1<sup>st</sup> Year
-                  </div>
-                ) : (
-                  <div
-                    className="p-4 cursor-pointer"
-                    onClick={() => setCurrentYear("1st Year")}
-                  >
-                    1<sup>st</sup> Year
-                  </div>
-                )}
-                {currentYear == "2st Year" ? (
-                  <div
-                    className={
-                      "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                    }
-                    onClick={() => setCurrentYear("2st Year")}
-                  >
-                    2<sup>st</sup> Year
-                  </div>
-                ) : (
-                  <div
-                    className="p-4 cursor-pointer"
-                    onClick={() => setCurrentYear("2st Year")}
-                  >
-                    2<sup>st</sup> Year
-                  </div>
-                )}
-              </div>
-            </div>
-            <div>
-              <div className="flex ml-12 font-mono mt-3">
-                {currentSection == "AIDS Section A" ? (
-                  <div
-                    className={
-                      "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                    }
-                    onClick={() => setCurrentSection("AIDS Section A")}
-                  >
-                    AIDS Section A
-                  </div>
-                ) : (
-                  <div
-                    className="p-4 cursor-pointer"
-                    onClick={() => setCurrentSection("AIDS Section A")}
-                  >
-                    AIDS Section A
-                  </div>
-                )}
-                {currentSection == "AIDS Section B" ? (
-                  <div
-                    className={
-                      "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                    }
-                    onClick={() => setCurrentSection("AIDS Section B")}
-                  >
-                    AIDS Section B
-                  </div>
-                ) : (
-                  <div
-                    className="p-4 cursor-pointer"
-                    onClick={() => setCurrentSection("AIDS Section B")}
-                  >
-                    AIDS Section B
-                  </div>
-                )}
-                {currentSection == "AIDS Section C" ? (
-                  <div
-                    className={
-                      "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                    }
-                    onClick={() => setCurrentSection("AIDS Section C")}
-                  >
-                    AIDS Section C
-                  </div>
-                ) : (
-                  <div
-                    className="p-4 cursor-pointer"
-                    onClick={() => setCurrentSection("AIDS Section C")}
-                  >
-                    AIDS Section C
-                  </div>
-                )}
-                {currentSection == "IoT Section A" ? (
-                  <div
-                    className={
-                      "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                    }
-                    onClick={() => setCurrentSection("IoT Section A")}
-                  >
-                    IoT Section A
-                  </div>
-                ) : (
-                  <div
-                    className="p-4 cursor-pointer"
-                    onClick={() => setCurrentSection("IoT Section A")}
-                  >
-                    IoT Section A
-                  </div>
-                )}
-                {currentSection == "IoT Section B" ? (
-                  <div
-                    className={
-                      "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                    }
-                    onClick={() => setCurrentSection("IoT Section B")}
-                  >
-                    IoT Section B
-                  </div>
-                ) : (
-                  <div
-                    className="p-4 cursor-pointer"
-                    onClick={() => setCurrentSection("IoT Section B")}
-                  >
-                    IoT Section B
-                  </div>
-                )}
-                {currentSection == "Cyber Security" ? (
-                  <div
-                    className={
-                      "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                    }
-                    onClick={() => setCurrentSection("Cyber Security")}
-                  >
-                    Cyber Security
-                  </div>
-                ) : (
-                  <div
-                    className="p-4 cursor-pointer"
-                    onClick={() => setCurrentSection("Cyber Security")}
-                  >
-                    Cyber Security
-                  </div>
-                )}
-              </div>
-            </div>
-            <>
-            <div className="md:mt-12 md:ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
-                <div className="font-black mr-auto ml-2 text-2xl mb-3">
-                  {(currentYear + " B_Tech " + currentSection).replace("B_Tech", "B.Tech")}
-                </div>
-                <div className="flex items-center mb-4 rounded-lg px-2">
-                  <div className=" flex flex-col items-center rounded-lg">
-                    <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
-                      Slot
-                    </div>
-                    <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
-                      Day
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    {currentYear == "1st Year"
-                      ? year1.map((slot, index) => (
-                          <div
-                            key={index}
-                            className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                          >
-                            {slot}
-                          </div>
-                        ))
-                      : [
-                          "8.10-9.00",
-                          "9.00-9.50",
-                          "9.50-10.40",
-                          "Break",
-                          "11.00-11.50",
-                          "11.50-12.40",
-                          "Lunch",
-                          "1.40-2.30",
-                          "Break",
-                          "2.40-3.30",
-                        ].map((slot, index) => (
-                          <div
-                            key={index}
-                            className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                          >
-                            {slot}
-                          </div>
-                        ))}
-                  </div>
-                </div>
-                <div className="flex">
-                  <div className="flex flex-col gap-1 rounded-lg mr-1">
-                    {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => (
+
+            {isGenerated && (
+              <>
+                <div>
+                  <div className="flex ml-12 font-mono mt-3">
+                    {currentYear == "1st Year" ? (
                       <div
-                        key={index}
-                        className="w-12 h-8 md:w-24 md:h-16 flex text-[7px] md:text-sm items-center justify-center border bg-[#bfc0c0] rounded-lg"
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentYear("1st Year")}
                       >
-                        {day}
+                        1<sup>st</sup> Year
                       </div>
-                    ))}
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentYear("1st Year")}
+                      >
+                        1<sup>st</sup> Year
+                      </div>
+                    )}
+                    {currentYear == "2nd Year" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentYear("2nd Year")}
+                      >
+                        2<sup>st</sup> Year
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentYear("2nd Year")}
+                      >
+                        2<sup>st</sup> Year
+                      </div>
+                    )}
                   </div>
                 </div>
-                <button
-                  className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
-                  onClick={() => {
-                    genPDF((currentYear + " B_Tech " + currentSection));
-                  }}
-                >
-                  Save
-                </button>
-              </div>
-            </>
+                <div>
+                  <div className="flex ml-12 font-mono mt-3">
+                    {currentSection == "AIDS Section A" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentSection("AIDS Section A")}
+                      >
+                        AIDS Section A
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentSection("AIDS Section A")}
+                      >
+                        AIDS Section A
+                      </div>
+                    )}
+                    {currentSection == "AIDS Section B" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentSection("AIDS Section B")}
+                      >
+                        AIDS Section B
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentSection("AIDS Section B")}
+                      >
+                        AIDS Section B
+                      </div>
+                    )}
+                    {currentSection == "AIDS Section C" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentSection("AIDS Section C")}
+                      >
+                        AIDS Section C
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentSection("AIDS Section C")}
+                      >
+                        AIDS Section C
+                      </div>
+                    )}
+                    {currentSection == "IoT Section A" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentSection("IoT Section A")}
+                      >
+                        IoT Section A
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentSection("IoT Section A")}
+                      >
+                        IoT Section A
+                      </div>
+                    )}
+                    {currentSection == "IoT Section B" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentSection("IoT Section B")}
+                      >
+                        IoT Section B
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentSection("IoT Section B")}
+                      >
+                        IoT Section B
+                      </div>
+                    )}
+                    {currentSection == "Cyber Security" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentSection("Cyber Security")}
+                      >
+                        Cyber Security
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentSection("Cyber Security")}
+                      >
+                        Cyber Security
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="md:mt-12 md:ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
+                  <div className="font-black mr-auto ml-2 text-2xl mb-3">
+                    {(currentYear + " B_Tech " + currentSection).replace(
+                      "B_Tech",
+                      "B.Tech",
+                    )}
+                  </div>
+                  <div className="flex items-center mb-4 rounded-lg px-2">
+                    <div className=" flex flex-col items-center rounded-lg">
+                      <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
+                        Slot
+                      </div>
+                      <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
+                        Day
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      {currentYear == "1st Year"
+                        ? year1.map((slot, index) => (
+                            <div
+                              key={index}
+                              className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                            >
+                              {slot}
+                            </div>
+                          ))
+                        : [
+                            "8.10-9.00",
+                            "9.00-9.50",
+                            "9.50-10.40",
+                            "Break",
+                            "11.00-11.50",
+                            "11.50-12.40",
+                            "Lunch",
+                            "1.40-2.30",
+                            "Break",
+                            "2.40-3.30",
+                          ].map((slot, index) => (
+                            <div
+                              key={index}
+                              className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                            >
+                              {slot}
+                            </div>
+                          ))}
+                    </div>
+                  </div>
+                  <div className="flex">
+                    <div className="flex flex-col gap-1 rounded-lg mr-1">
+                      {["Mon", "Tue", "Wed", "Thu", "Fri"].map((day, index) => (
+                        <>
+                          <div
+                            key={index}
+                            className="w-12 h-8 md:w-24 md:h-16 flex text-[7px] md:text-sm items-center justify-center border bg-[#bfc0c0] rounded-lg"
+                          >
+                            <div>{day}</div>
+                          </div>
+
+                          <div
+                            className="grid grid-rows-5 rounded-lg gap-1 grid-flow-col"
+                            key={index + 7}
+                          >
+                            {table[
+                              currentYear + " B_Tech " + currentSection
+                            ].map((_, colIndex) => (
+                              <div className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto">
+                                {table[currentYear + ' B_Tech ' + currentSection][index][colIndex]}
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      ))}
+                    </div>
+                    <div className="grid grid-rows-5 rounded-lg gap-1 grid-flow-col"></div>
+                  </div>
+                  <button
+                    className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
+                    onClick={() => {
+                      genPDF(currentYear + " B_Tech " + currentSection);
+                    }}
+                  >
+                    Save
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       ) : (

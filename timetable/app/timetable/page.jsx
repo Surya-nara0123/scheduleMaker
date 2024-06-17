@@ -8,7 +8,6 @@ const pb = new PocketBase("https://snuc.pockethost.io");
 
 export default function Home() {
   const [proffTimetable, setProffTimetable] = useState([]);
-  const [showTable, setShowTable] = useState(true);
   const [currentTab, setCurrentTab] = useState("Student");
   const [classYear, setClassYear] = React.useState("");
   const [timetableData, setTimetable] = React.useState([]);
@@ -24,22 +23,20 @@ export default function Home() {
     "break",
     "2.40-3.30",
   ];
-  // const year2 = [
 
-  // ]
   const fetchTimetable = async () => {
-    try{
-    const record = await pb.collection("timetable").getFullList();
-    console.log(record[0].timetable[classYear]);
-    setTimetable(record[0].timetable);
-    setProffTimetable(record[1].timetable);
-  }catch(e){}}
+    try {
+      const record = await pb.collection("timetable").getFullList();
+      console.log(record[0].timetable[classYear]);
+      setTimetable(record[0].timetable);
+      setProffTimetable(record[1].timetable);
+    } catch (e) {}
+  };
 
   const [loggedin, setLoggedin] = React.useState(false);
 
   useEffect(() => {
     fetchTimetable();
-    // console.log(pb.authStore.model.isStudent);
     const model = pb.authStore.model;
     if (!model) {
       setLoggedin(false);
@@ -53,11 +50,7 @@ export default function Home() {
     }
   }, []);
 
-  const isActive = () =>
-    currentTab == "Student" ? "bg-[#f8f8f8] bg-opacity-25" : "";
-
   const [proff, setProff] = useState({});
-
 
   return (
     <main className="min-h-screen bg-[#B4D2E7] select-none">
@@ -186,7 +179,7 @@ export default function Home() {
                                 >
                                   {day}
                                 </div>
-                              )
+                              ),
                             )}
                           </div>
                           <div className="grid grid-rows-5 rounded-lg gap-1 grid-flow-col">
@@ -224,15 +217,15 @@ export default function Home() {
                                           </div>
                                         )}
                                       </div>
-                                    )
+                                    ),
                                   )}
                                 </>
-                              )
+                              ),
                             )}
                           </div>
                         </div>
                       </div>
-                    )
+                    ),
                 )}
               </>
             ) : (
@@ -251,7 +244,7 @@ export default function Home() {
                     {Object.keys(proffTimetable)
                       .sort(
                         (a, b) =>
-                          a.replace("Proff", "") - b.replace("Proff", "")
+                          a.replace("Proff", "") - b.replace("Proff", ""),
                       )
                       .map((key, index) => (
                         <option key={index}>{key}</option>
@@ -261,7 +254,10 @@ export default function Home() {
                 {Object.keys(proffTimetable).map(
                   (dataa, index) =>
                     dataa == Object.keys(proff)[0] && (
-                      <div className="md:mt-6 md:ml-14 flex flex-col items-center bg-white p-4 rounded-lg">
+                      <div
+                        className="md:mt-6 md:ml-14 flex flex-col items-center bg-white p-4 rounded-lg"
+                        key={index}
+                      >
                         <div className="font-black mr-auto ml-2 text-2xl mb-3">
                           {dataa.replace("B_Tech", "B.Tech")}
                         </div>
@@ -315,7 +311,7 @@ export default function Home() {
                                 >
                                   {day}
                                 </div>
-                              )
+                              ),
                             )}
                           </div>
                           <div className="grid grid-rows-5 rounded-lg gap-1 grid-flow-col">
@@ -328,22 +324,15 @@ export default function Home() {
                                         key={colIndex + rowIndex}
                                         className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
                                       >
-                                        {proff[dataa][rowIndex][
-                                          colIndex
-                                        ] != "b" &&
-                                        proff[dataa][rowIndex][
-                                          colIndex
-                                        ] != "l" ? (
+                                        {proff[dataa][rowIndex][colIndex] !=
+                                          "b" &&
+                                        proff[dataa][rowIndex][colIndex] !=
+                                          "l" ? (
                                           <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                                            {
-                                              proff[dataa][rowIndex][
-                                                colIndex
-                                              ]
-                                            }
+                                            {proff[dataa][rowIndex][colIndex]}
                                           </div>
-                                        ) : proff[dataa][rowIndex][
-                                            colIndex
-                                          ] == "b" ? (
+                                        ) : proff[dataa][rowIndex][colIndex] ==
+                                          "b" ? (
                                           <div className="text-center w-full h-full items-center justify-center flex font-bold">
                                             Break
                                           </div>
@@ -353,15 +342,15 @@ export default function Home() {
                                           </div>
                                         )}
                                       </div>
-                                    )
+                                    ),
                                   )}
                                 </>
-                              )
+                              ),
                             )}
                           </div>
                         </div>
                       </div>
-                    )
+                    ),
                 )}
               </>
             )}
