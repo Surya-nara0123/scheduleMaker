@@ -39,13 +39,13 @@ function isEmptyLabs(lab_classes: ClassesToCourses): boolean {
 }
 
 function freeLabs(courseCode: string, timing: Timing, timetable_labs: Timetable): string[] {
-  const usable = [];
+  const usable: string[] = [];
   for (const lab of Object.keys(timetable_labs)) {
     if (lab.startsWith(courseCode.slice(0, 3))) {
       usable.push(lab);
     }
   }
-  const temp = [...usable];
+  const temp = JSON.parse(JSON.stringify(usable));
   for (const lab of usable) {
     for (const usage of timetable_labs[lab]) {
       if (usage[0][2] !== timing[2]) {
@@ -156,7 +156,7 @@ function labs_insert(lab_classes: ClassesToCourses, timetable_classes: OrderedTa
           choice = "PHY102";
           let lab1 = "PHYLAB1";
           let lab2 = possible_labs["CSE102"][make_random() % possible_labs["CSE102"].length];
-          let details = [];
+          let details: [string, number, string, string][] = [];
           let phy_proff = "";
           let cpo_proff = "";
           for (let _c = 0, _d = lab_classes[clas]; _c < _d.length; _c++) {
@@ -189,11 +189,11 @@ function labs_insert(lab_classes: ClassesToCourses, timetable_classes: OrderedTa
               timetable_labs[lab2].push([[classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot + (i[1] - 1)][1], day], clas, "CSE102"]);
             }
           }
-          let temp = JSON.parse(JSON.stringify(lab_classes[clas]));
+          let temp: [string, number, string, string][] = JSON.parse(JSON.stringify(lab_classes[clas]));
           let check1 = false, check2 = false;
-          let to_remove = [];
-          for (let _h = 0, temp_1 = temp; _h < temp_1.length; _h++) {
-            let course = temp_1[_h];
+          let to_remove: [string, number, string, string][] = [];
+          for (let h = 0; h < temp.length; h++) {
+            let course: [string, number, string, string] = temp[h];
             if (course[0] == "PHY102" && !check1) {
               to_remove.push(course);
               check1 = true;
@@ -311,7 +311,7 @@ function theory_insert(theory_classes: ClassesToCourses, timetable_classes: Orde
         if (timetable_classes[clas][day][slot] != "") {
           continue;
         }
-        let possibles = [];
+        let possibles: [string, number, string, string][] = [];
         for (let _a = 0, _b = theory_classes[clas]; _a < _b.length; _a++) {
           let course = _b[_a];
           if (isFreeProfessor([classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, course[3])) {
@@ -347,7 +347,7 @@ function theory_insert(theory_classes: ClassesToCourses, timetable_classes: Orde
               }
             }
             if (!found_something) {
-              let slots = [];
+              let slots: number[] = [];
               for (let i = 0; i < slot; i++) {
                 if (typeof timetable_classes[clas][day][i] == typeof "Lunch") {
                   continue;
@@ -446,7 +446,7 @@ function theory_update(theory_classes: ClassesToCourses, timetable_classes: Orde
           }
 
           if (timetable_classes[clas][day][slot][0].includes("Self-Learning")) {
-            const possibles = [];
+            const possibles: [string, number, string, string][] = [];
             for (const x of theory_classes[clas]) {
               if (isFreeProfessor([classes_timings[clas.slice(0, 3)][slot][0], classes_timings[clas.slice(0, 3)][slot][1], day], timetable_professors, x[3])) {
                 possibles.push(x);
@@ -501,7 +501,7 @@ function theory_update(theory_classes: ClassesToCourses, timetable_classes: Orde
   }
 }
 
-function verifyEverything(classes_timings: TimingMap, timetable_classes: OrderedTable, timetable_professors: Timetable, timetable_labs: Timetable, backup: ClassesToCourses) {
+function verifyEverything(classes_timings: TimingMap, timetable_classes: OrderedTable, timetable_professors: Timetable, timetable_labs: Timetable, backup: ClassesToCourses): boolean {
   for (const clas in timetable_classes) {
     for (let day = 0; day < timetable_classes[clas].length; day++) {
       let selfCount = 0;
@@ -655,7 +655,7 @@ function verifyEverything(classes_timings: TimingMap, timetable_classes: Ordered
   return true
 }
 
-function format_professors(timetable_professors: Timetable, classes_timings: TimingMap, timetable_classes: OrderedTable) {
+function format_professors(timetable_professors: Timetable, classes_timings: TimingMap, timetable_classes: OrderedTable): [OrderedTable, Timetable] {
   let result: OrderedTable = {}
   let exceptions: Timetable = {}
   let proffs = Object.keys(timetable_professors);
@@ -676,12 +676,13 @@ function format_professors(timetable_professors: Timetable, classes_timings: Tim
     } else {
       result[proff] = []
       for (let j = 0; j < 5; j++) {
-        result[proff].push([])
-        for (let slot of classes_timings[curr]) {
-          if (slot[2].includes("C")) {
-            result[proff][j].push("");
-          } else if (slot[2].includes("L")) {
-            result[proff][j].push("Lunch");
+        result[proff].push([""])
+        for (let slot = 1; slot < classes_timings[curr].length; slot++) {
+          if (classes_timings[curr][slot][2].includes("C")) {
+            result[proff][j].push("")
+          }
+          else if (classes_timings[curr][slot][2].includes("L")) {
+            result[proff][j].push("Lunch")
           }
         }
       }
@@ -692,13 +693,18 @@ function format_professors(timetable_professors: Timetable, classes_timings: Tim
           }
           for (const lecture of timetable_professors[proff]) {
             if (lecture[0][0] <= classes_timings[curr][slot][0] && lecture[0][1] >= classes_timings[curr][slot][1] && lecture[0][2] === day) {
-              result[proff][day][slot] = [lecture[1], lecture[2]]
-              if (!(timetable_classes[lecture[1]][day][slot].length === 2)) {
-                for (let item of timetable_classes[lecture[1]][day][slot]) {
-                  if (item.includes("LAB")) {
-                    result[proff][day][slot].push(item)
-                  }
+              if (timetable_classes[lecture[1]][day][slot].length === 3) {
+                result[proff][day][slot] = [lecture[1], lecture[2], timetable_classes[lecture[1]][day][slot][1]]
+              } else if (timetable_classes[lecture[1]][day][slot].length === 4) {
+                result[proff][day][slot] = [lecture[1], lecture[2], timetable_classes[lecture[1]][day][slot][1], timetable_classes[lecture[1]][day][slot][2]]
+              } else if (timetable_classes[lecture[1]][day][slot].length === 6) {
+                if (proff == timetable_classes[lecture[1]][day][slot][4]) {
+                  result[proff][day][slot] = [lecture[1], lecture[2], timetable_classes[lecture[1]][day][slot][2]]
+                } else {
+                  result[proff][day][slot] = [lecture[1], lecture[2], timetable_classes[lecture[1]][day][slot][3]]
                 }
+              } else {
+                result[proff][day][slot] = [lecture[1], lecture[2]]
               }
             }
           }
@@ -867,11 +873,11 @@ function initialise_class_courses(classes_to_courses: ClassesToCourses) {
 function initialise_class_timetable(timetable_classes_init: OrderedTable, timetable_professors_init: Timetable, classes_timings: TimingMap, initial_lectures: [string, string, string, number, number][], classes_to_courses: ClassesToCourses) {
   for (let [clas, val] of Object.entries(timetable_classes_init)) {
     for (let i = 0; i < 5; i++) {
-      val.push([]);
-      for (let slot of classes_timings[clas.slice(0, 3)]) {
-        if (slot[2].includes("C")) {
+      val.push([""])
+      for (let slot = 1; slot < classes_timings[clas.slice(0, 3)].length; slot++) {
+        if (classes_timings[clas.slice(0, 3)][slot][2].includes("C")) {
           val[i].push("");
-        } else if (slot[2].includes("L")) {
+        } else if (classes_timings[clas.slice(0, 3)][slot][2].includes("L")) {
           val[i].push("Lunch");
         }
       }
