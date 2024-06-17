@@ -271,7 +271,7 @@ export default function Home() {
                             </div>
                           </div>
                           <div className="flex gap-1">
-                            {proff[dataa][0][2] != "b"
+                            {proff[dataa][0][2] == "Break"
                               ? year1.map((slot, index) => (
                                   <div
                                     key={index}
