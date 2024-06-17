@@ -356,7 +356,7 @@ function theory_insert(theory_classes: ClassesToCourses, timetable_classes: Orde
                                     slots.push(i);
                                 }
                             }
-                            let posses = [];
+                            let posses: [number, [string, number, string, string][]][] = [];
                             for (let _d = 0, slots_1 = slots; _d < slots_1.length; _d++) {
                                 let pos = slots_1[_d];
                                 let replacements = theory_classes[clas].filter(function (course) {
@@ -430,7 +430,7 @@ function theory_insert(theory_classes: ClassesToCourses, timetable_classes: Orde
     }
 }
 
-function theory_update(theory_classes, timetable_classes, timetable_professors, classes_timings) {
+function theory_update(theory_classes: ClassesToCourses, timetable_classes: OrderedTable, timetable_professors: Timetable, classes_timings: TimingMap) {
     for (const clas in theory_classes) {
         if (theory_classes[clas].length === 0) {
             continue;
@@ -501,7 +501,7 @@ function theory_update(theory_classes, timetable_classes, timetable_professors, 
     }
 }
 
-function verifyEverything(classes_timings, timetable_classes, timetable_professors, timetable_labs, backup) {
+function verifyEverything(classes_timings: TimingMap, timetable_classes: OrderedTable, timetable_professors: Timetable, timetable_labs: Timetable, backup: ClassesToCourses) {
     for (const clas in timetable_classes) {
         for (let day = 0; day < timetable_classes[clas].length; day++) {
             let selfCount = 0;
@@ -655,9 +655,9 @@ function verifyEverything(classes_timings, timetable_classes, timetable_professo
     return true
 }
 
-function format_professors(timetable_professors, classes_timings, timetable_classes) {
-    let result = {}
-    let exceptions = {}
+function format_professors(timetable_professors: Timetable, classes_timings: TimingMap, timetable_classes: OrderedTable) {
+    let result: OrderedTable = {}
+    let exceptions: Timetable = {}
     let proffs = Object.keys(timetable_professors);
     for (let _i = 0, proffs_1 = proffs; _i < proffs_1.length; _i++) {
         let proff = proffs[_i];
@@ -709,7 +709,7 @@ function format_professors(timetable_professors, classes_timings, timetable_clas
     return [result, exceptions]
 }
 
-function add_breaks(timetable_classes, classes_timings, timetable_professors) {
+function add_breaks(timetable_classes: OrderedTable, classes_timings: TimingMap, timetable_professors: OrderedTable) {
     let classes = Object.keys(timetable_classes)
     for (let i = 0, classes_1 = classes; i < classes_1.length; i++) {
         let clas = classes[i]
@@ -777,11 +777,11 @@ function add_breaks(timetable_classes, classes_timings, timetable_professors) {
     }
 }
 
-function is_proff(str) {
+function is_proff(str: string) {
     return str.includes("Proff")
 }
 
-function convert_to_string(timetable_classes, proff_to_short, timetable_professors) {
+function convert_to_string(timetable_classes: OrderedTable, proff_to_short: {[key: string]: string}, timetable_professors: OrderedTable) {
     let classes = Object.keys(timetable_classes);
     for (let i = 0; i < classes.length; i++) {
         let clas = classes[i]
@@ -828,23 +828,23 @@ function convert_to_string(timetable_classes, proff_to_short, timetable_professo
     }
 }
 
-function initialise_class_courses(classes_to_courses){
+function initialise_class_courses(classes_to_courses: ClassesToCourses){
     for (let [clas, courses] of Object.entries(classes_to_courses)) {
         for (let course of courses) {
             if (course[2] === "LT") {
-                let temp = [course[0] + " T", course[1] - 2, "T", course[3]];
+                let temp: [string, number, string, string] = [course[0] + " T", course[1] - 2, "T", course[3]];
                 course[1] = 2;
                 course[2] = "L";
                 classes_to_courses[clas].push(temp);
             } else if (course[2] === "L") {
                 course[1] = course[1] - 1;
-                let temp = [course[0] + " T", 1, "T", course[3]];
+                let temp: [string, number, string, string] = [course[0] + " T", 1, "T", course[3]];
                 classes_to_courses[clas].push(temp);
             }
         }
     }
 
-    let backup = JSON.parse(JSON.stringify(classes_to_courses));
+    let backup: ClassesToCourses = JSON.parse(JSON.stringify(classes_to_courses));
     for (let [clas, courses] of Object.entries(backup)) {
         let sum1 = 0;
         for (let course of courses) {
@@ -864,7 +864,7 @@ function initialise_class_courses(classes_to_courses){
     return classes_to_courses
 }
 
-function initialise_class_timetable(timetable_classes_init, timetable_professors_init, classes_timings, initial_lectures, classes_to_courses){
+function initialise_class_timetable(timetable_classes_init: OrderedTable, timetable_professors_init: Timetable, classes_timings: TimingMap, initial_lectures: [string, string, string, number, number][], classes_to_courses: ClassesToCourses){
     for (let [clas, val] of Object.entries(timetable_classes_init)) {
         for (let i = 0; i < 5; i++) {
             val.push([]);
@@ -897,20 +897,20 @@ function initialise_class_timetable(timetable_classes_init, timetable_professors
     }
 }
 
-function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures) {
-    let classes_timings = {
+function get_timetables(class_courses: ClassesToCourses, professors: string[], proff_to_short: {[key: string]: string}, labs: string[], initial_lectures: [string, string, string, number, number][]) {
+    let classes_timings: TimingMap = {
         "1st": [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "BC"]],
         "2nd": [[810, 900, "C"], [900, 950, "C"], [950, 1040, "C"], [1040, 1150, "BC"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "BC"]]
     };
 
     let classes_to_courses = JSON.parse(JSON.stringify(class_courses));
     
-    let timetable_professors_init = {};
+    let timetable_professors_init: Timetable = {};
     for (let professor of professors) {
         timetable_professors_init[professor] = [];
     }
 
-    let timetable_classes_init = {};
+    let timetable_classes_init: OrderedTable = {};
     for (let clas of Object.keys(class_courses)) {
         timetable_classes_init[clas] = [];
     }
@@ -924,16 +924,16 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
     let check = false
     let fallback = 0;
     while (!check && fallback < 50) {
-        let class_courses_1 = JSON.parse(JSON.stringify(classes_to_courses));
-        let class_courses_2 = JSON.parse(JSON.stringify(backup));
+        let class_courses_1: ClassesToCourses = JSON.parse(JSON.stringify(classes_to_courses));
+        let class_courses_2: ClassesToCourses = JSON.parse(JSON.stringify(backup));
 
-        let lab_classes = {};
+        let lab_classes:ClassesToCourses = {};
         for (let [clas, courses] of Object.entries(class_courses_1)) {
             let labCourses = courses.filter(course => course[2] === "L");
             lab_classes[clas] = JSON.parse(JSON.stringify(labCourses));
         }
 
-        let theory_classes = {};
+        let theory_classes:ClassesToCourses = {};
         for (let [clas, courses] of Object.entries(class_courses_1)) {
             theory_classes[clas] = courses.filter(course => course[2] === "T");
         }
@@ -941,7 +941,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
         let timetable_professors = JSON.parse(JSON.stringify(timetable_professors_init));
         let timetable_classes = JSON.parse(JSON.stringify(timetable_classes_init));
 
-        let timetable_labs = {};
+        let timetable_labs:Timetable = {};
         for (let lab of labs) {
             timetable_labs[lab] = [];
         }
@@ -960,7 +960,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
         if (check) {
             let temp1 = JSON.parse(JSON.stringify(proffs_temp));
             console.log(temp1);
-            let proffs_dicts = format_professors(proffs_temp, classes_timings, timetable_classes);
+            let proffs_dicts: [OrderedTable, Timetable] = format_professors(proffs_temp, classes_timings, timetable_classes);
             let temp2 = JSON.parse(JSON.stringify(proffs_temp));
             console.log(temp2);
             add_breaks(timetable_classes, classes_timings, proffs_dicts[0])
@@ -973,7 +973,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
     return {};
 }
 
-export function randomize(class_courses, professors, proff_to_short, labs, initial_lectures) {
+export function randomize(class_courses: ClassesToCourses, professors: string[], proff_to_short: {[key: string]: string}, labs: string[], initial_lectures: [string, string, string, number, number][]) {
     try {
         const result = get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures);
         return result;
@@ -983,9 +983,9 @@ export function randomize(class_courses, professors, proff_to_short, labs, initi
     }
 }
 
-export function is_free_professor(proffs_tt, proffs_special_casses, proff, clas, day, slot){
+export function is_free_professor(proffs_tt: OrderedTable, proffs_special_casses: Timetable, proff: string, clas:string, day: number, slot: number){
     if(proff in proffs_special_casses){
-        let classes_timings = {
+        let classes_timings: TimingMap = {
             "1st": [[810, 900, "C"], [900, 950, "C"], [950, 1100, "BC"], [1100, 1150, "C"], [1150, 1250, "L"], [1250, 1340, "C"], [1340, 1430, "C"], [1430, 1530, "BC"]],
             "2nd": [[810, 900, "C"], [900, 950, "C"], [950, 1040, "C"], [1040, 1150, "BC"], [1150, 1240, "C"], [1240, 1340, "L"], [1340, 1430, "C"], [1430, 1530, "BC"]]
         };
