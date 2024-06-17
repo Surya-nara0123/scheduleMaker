@@ -616,34 +616,6 @@ export default function Table() {
                       </div>
                     ))}
                   </div>
-                  <div className="grid grid-rows-5 rounded-lg gap-1 grid-flow-col">
-                    {Array.from({ length: year1.length }).map((_, colIndex) => (
-                      <>
-                        {Array.from({ length: 5 }).map((_, rowIndex) => (
-                          <div
-                            key={colIndex + rowIndex}
-                            className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
-                          >
-                            {timetableData[(currentYear + " B_Tech " + currentSection)][rowIndex][colIndex] != "b" &&
-                            timetableData[(currentYear + " B_Tech " + currentSection)][rowIndex][colIndex] != "l" ? (
-                              <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                                {timetableData[(currentYear + " B_Tech " + currentSection)][rowIndex][colIndex]}
-                              </div>
-                            ) : timetableData[(currentYear + " B_Tech " + currentSection)][rowIndex][colIndex] ==
-                              "b" ? (
-                              <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                                Break
-                              </div>
-                            ) : (
-                              <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                                Lunch
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </>
-                    ))}
-                  </div>
                 </div>
                 <button
                   className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
