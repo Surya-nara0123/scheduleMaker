@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "TimeTable",
   description: "SNUC TimeTable for students and teachers",
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{

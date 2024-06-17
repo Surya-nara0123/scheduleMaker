@@ -1,19 +1,19 @@
-Math.seedrandom = function (seed) {
-    return function () {
-        let x = Math.sin(seed++) * 10000;
-        return x - Math.floor(x);
-    };
+function seedrandom(seed: number) {
+    const x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
 };
 
 function make_random() {
     const currentTimeNs = Date.now() * 1000000;
-    Math.seedrandom(currentTimeNs);
+    seedrandom(currentTimeNs);
     return Math.floor(Math.random() * 100000000);
 }
 
-const isEqual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+type LabClasses = {
+    class: ;
+};
 
-function isEmptyLabs(lab_classes) {
+function isEmptyLabs(lab_classes: LabClasses): bool {
     for (const k of Object.values(lab_classes)) {
         if (k.length !== 0) {
             return false;

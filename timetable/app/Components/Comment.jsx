@@ -1,4 +1,5 @@
 'use client'
+
 export function Comment() {
     return(
         <main className="overflow-x-auto py-6">
