@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/timetablegen/algo.tsx", "app/timetablegen/page.jsx", "app/timetablegen/page.jsx", "app/timetable/page.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/timetablegen/algo.tsx", "app/timetablegen/page.jsx", "app/timetablegen/page.jsx", "app/timetable/page.jsx", "app/comments/page.jsx"],
   "exclude": ["node_modules"]
 }
