@@ -623,7 +623,11 @@ export default function Table() {
                               currentYear + " B_Tech " + currentSection
                             ].map((_, colIndex) => (
                               <div className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto">
-                                {table[currentYear + ' B_Tech ' + currentSection][index][colIndex]}
+                                {
+                                  table[
+                                    currentYear + " B_Tech " + currentSection
+                                  ][index][colIndex]
+                                }
                               </div>
                             ))}
                           </div>

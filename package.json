@@ -1,11 +1,6 @@
 {
-  "dependencies": {
-    "papaparse": "^5.4.1",
-    "pocketbase": "^0.21.3",
-    "prettier": "^3.3.2",
-    "react-toastify": "^10.0.5"
-  },
-  "devDependencies": {
-    "@types/papaparse": "^5.3.14"
+  "scripts": {
+    "install": "cd timetable && npm install && cd ..",
+    "start": "cd timetable && npm run dev"
   }
 }
