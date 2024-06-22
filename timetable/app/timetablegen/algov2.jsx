@@ -344,64 +344,6 @@ function theory_update_1(theory_classes, timetable_classes, timetable_professors
     }
 }
 
-function theory_update_2(theory_classes, all_theory_classes, timetable_classes, timetable_professors){
-    for(let clas of Object.keys(theory_classes)){
-        if(theory_classes[clas].length === 0){
-            continue;
-        }
-        for(let day = 0; day < 5; day++){
-            for(let slot = 0; slot < 8; slot++){
-                if(timetable_classes[clas][day][slot] === ""){
-                    let possibles = []
-                    for(let course of all_theory_classes[clas]){
-                        if(course[0].includes("Self-Learning") || course[2] === "L"){
-                            continue;
-                        }
-                        if(is_free_professor(timetable_professors, course[3], day, slot)){
-                            possibles.push(course)
-                        }
-                    }
-                    if(possibles.length === 0){
-                        continue;
-                    }
-                    let replaceable = []
-                    for(let poss of possibles){
-                        for(let i = 0; i < 5; i++){
-                            for(let j = 0; j < 8; j++){
-                                if(timetable_professors[poss[3]][i][j].length === 2 && timetable_professors[poss[3]][i][j][1] == clas){
-                                    for(let course of theory_classes[clas]){
-                                        if(is_free_professor(timetable_professors, course[3], i, j)){
-                                            replaceable.push([poss, course, i, j])
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if(replaceable.length === 0){
-                        continue;
-                    }
-                    let choice = replaceable[make_random() % replaceable.length]
-                    timetable_classes[clas][day][slot] = [choice[0][0], choice[0][3]]
-                    timetable_classes[clas][choice[2]][choice[3]] = [choice[1][0], choice[1][3]]
-                    timetable_professors[choice[0][3]][day][slot] = [choice[0][0], clas]
-                    timetable_professors[choice[0][3]][choice[2]][choice[3]] = ""
-                    timetable_professors[choice[1][3]][day][slot] = [choice[1][0], clas]
-                    for(let course of theory_classes[clas]){
-                        if (course[0] == choice[1][0]){
-                            course[1] -= 1;
-                            if (course[1] === 0){
-                                theory_classes[clas].splice(theory_classes[clas].indexOf(course), 1)
-                            }
-                            break
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 function initialise_class_courses(class_courses) {
     let result = JSON.parse(JSON.stringify(class_courses))
     let temp = JSON.parse(JSON.stringify(class_courses))
@@ -785,7 +727,6 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
             timetable_professors_temp = JSON.parse(JSON.stringify(timetable_professors));
             theory_insert(theory_temp, timetable_classes_temp, timetable_professors_temp);
             theory_update_1(theory_temp, timetable_classes_temp, timetable_professors_temp);
-            theory_update_2(theory_temp, theory_classes, timetable_classes_temp, timetable_professors_temp);
             if (is_assigned_courses(theory_temp)) {
                 break;
             }
