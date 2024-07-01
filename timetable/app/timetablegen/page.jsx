@@ -632,7 +632,7 @@ export default function Table() {
                     </div>
                     <div className="grid grid-rows-5 rounded-lg gap-1 grid-flow-col"></div>
                   </div>
-                  <button
+                  <button 
                     className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
                     onClick={() => {
                       genPDF(currentYear + " B_Tech " + currentSection);
