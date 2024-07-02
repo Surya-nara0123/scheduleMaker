@@ -7,8 +7,8 @@ import Modal from "../Components/Modal";
 const pb = new PocketBase("https://snuc.pockethost.io");
 
 export default function Home() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [selectedClass, setSelectedClass] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedClass, setSelectedClass] = useState("");
 
   const [proffTimetable, setProffTimetable] = useState([]);
   const [currentTab, setCurrentTab] = useState("Professor");
@@ -28,20 +28,27 @@ export default function Home() {
   ];
 
   const handleClose = () => {
-    setIsOpen(false);;
-  }
-
-  const handleModal = (dataa) => {
-    
-    // console.log(dataa);
-    // if (dataa === selectedClass) {
-    //   setIsOpen(false);
-    //   setSelectedClass("");
-    // } else {
-    //   setSelectedClass(dataa);
-    //   setIsOpen(true);
-    // }
+    setIsOpen(false);
+    setSelectedClass("");
   };
+
+  const handleModal = (
+    dataa: string,
+    weekIndex: number,
+    classIndex: number,
+  ) => {
+    console.log(
+      `data: ${dataa}, rowIndex: ${weekIndex}, colIndex: ${classIndex}`,
+    );
+    if (dataa === selectedClass) {
+      setIsOpen(false);
+      setSelectedClass("");
+    } else {
+      setSelectedClass(dataa);
+      setIsOpen(true);
+    }
+  };
+
   const fetchTimetable = async () => {
     try {
       const record = await pb.collection("timetable").getFullList();
@@ -72,6 +79,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#B4D2E7] select-none">
+      <button onClick={handleModal}>this</button>
       {loggedin ? (
         <div className="flex">
           <Sidebar />
@@ -81,7 +89,6 @@ export default function Home() {
               <div className="bg-white h-0.5 w-1/2 mt-1"></div>
             </div>
             <div className="flex ml-12 font-mono mt-3">
-              
               {currentTab == "Professor" ? (
                 <div
                   className={
@@ -233,8 +240,13 @@ export default function Home() {
             ) : (
               <>
                 <div className="flex flex-col gap-8 ml-12 mt-8">
-                <button className="border rounded-lg py-1" onClick={handleModal}>Testing</button>
-                {/* {isOpen && (<Modal onClose={ handleModal }/>)} */}
+                  <button
+                    className="border rounded-lg py-1"
+                    onClick={handleModal}
+                  >
+                    Testing
+                  </button>
+                  {/* {isOpen && (<Modal onClose={ handleModal }/>)} */}
                   <select
                     className="bg-white rounded-lg p-2"
                     onChange={(e) => {
@@ -262,17 +274,22 @@ export default function Home() {
                         className="md:mt-6 md:ml-14 flex flex-col items-center bg-white p-4 rounded-lg"
                         key={index}
                       >
-                        <div className="font-black mr-auto ml-2 text-2xl mb-3 cursor-pointer" onClick={() => {console.log(`f: ${dataa}`); (dataa)}}>
-
+                        <div
+                          className="font-black mr-auto ml-2 text-2xl mb-3 cursor-pointer"
+                          onClick={() => {
+                            console.log(`f: ${dataa}`);
+                            dataa;
+                          }}
+                        >
                           {dataa.replace("B_Tech", "B.Tech")}
                         </div>
                         {isOpen && (
-                                <Modal
-                                    isOpen={isOpen}
-                                    onClose={handleClose}
-                                    selectedSlot={proffTimetable[selectedClass]} // Adjust this based on your data structure
-                                />
-                                )}
+                          <Modal
+                            isOpen={isOpen}
+                            onClose={handleClose}
+                            selectedSlot={proffTimetable[selectedClass]} // Adjust this based on your data structure
+                          />
+                        )}
                         <div className="flex items-center mb-4 rounded-lg px-2">
                           <div className=" flex flex-col items-center rounded-lg">
                             <div className="md:w-24 md:h-8 w-12 h-4 flex text-[7px] md:text-sm items-center justify-center border bg-[#909090] rounded-lg mr-1">
@@ -335,6 +352,13 @@ export default function Home() {
                                       <div
                                         key={colIndex + rowIndex}
                                         className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
+                                        onClick={() => {
+                                          handleModal(
+                                            dataa,
+                                            rowIndex,
+                                            colIndex,
+                                          );
+                                        }}
                                       >
                                         {proff[dataa][rowIndex][colIndex] !=
                                           "b" &&
