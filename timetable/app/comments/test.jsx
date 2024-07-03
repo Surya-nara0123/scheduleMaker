@@ -204,12 +204,9 @@ export default function Table() {
               </div>
             </div>
             <>
-              <div className="md:mt-12 md:ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
+            <div className="md:mt-12 md:ml-12 flex flex-col items-center bg-white p-4 rounded-lg">
                 <div className="font-black mr-auto ml-2 text-2xl mb-3">
-                  {(currentYear + " B_Tech " + currentSection).replace(
-                    "B_Tech",
-                    "B.Tech",
-                  )}
+                  {(currentYear + " B_Tech " + currentSection).replace("B_Tech", "B.Tech")}
                 </div>
                 <div className="flex items-center mb-4 rounded-lg px-2">
                   <div className=" flex flex-col items-center rounded-lg">
@@ -267,7 +264,7 @@ export default function Table() {
                   className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
                   onClick={fetchTimetable}
                 >
-                  Fetch
+                    Fetch
                 </button>
               </div>
             </>
