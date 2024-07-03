@@ -3,9 +3,12 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar.tsx";
 import { generatePDF } from "./print.jsx";
-import { randomize } from "./algo.ts";
+import { randomize } from "./algo.jsx";
 import Papa from "papaparse";
 import PocketBase from "pocketbase";
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+
 
 const pb = new PocketBase("https://snuc.pockethost.io");
 
@@ -279,15 +282,33 @@ export default function Table() {
       ];
       proffDetails.push(temp);
     }
-    console.log(proffDetails);
+    // console.log(proffDetails);
     return proffDetails;
   };
-
   const genPDF = async (classTitle) => {
     let temp = {};
     let a = await convertDetails(classTitle);
     temp[classTitle] = timetableData[classTitle];
     await generatePDF(temp, a);
+  };
+  const genPDFall = async () => {
+    let zip = new JSZip();
+    let count = 0;
+    for (let key in timetableData) {
+      let temp = {};
+      let a = convertDetails(key);
+      temp[key] = timetableData[key];
+      let pdf = await generatePDF(temp, a);
+      zip.file(key + ".pdf", pdf);
+      count++;
+    }
+    if (count == 0) {
+      alert("No Timetables to save");
+      return;
+    }
+    zip.generateAsync({ type: "blob" }).then(function (content) {
+      saveAs(content, "Timetables.zip");
+    });
   };
 
   const saveTimeTable = async () => {
@@ -395,7 +416,7 @@ export default function Table() {
                 </button>
                 <button
                   className="bg-blue-500 justify-center items-center rounded-lg p-2 ml-2"
-                  onClick={printOutput}
+                  onClick={genPDFall}
                 >
                   Save All Timetables
                 </button>
@@ -438,14 +459,48 @@ export default function Table() {
                         }
                         onClick={() => setCurrentYear("2nd Year")}
                       >
-                        2<sup>st</sup> Year
+                        2<sup>nd</sup> Year
                       </div>
                     ) : (
                       <div
                         className="p-4 cursor-pointer"
                         onClick={() => setCurrentYear("2nd Year")}
                       >
-                        2<sup>st</sup> Year
+                        2<sup>nd</sup> Year
+                      </div>
+                    )}
+                    {currentYear == "3rd Year" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentYear("2nd Year")}
+                      >
+                        3<sup>rd</sup> Year
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentYear("3rd Year")}
+                      >
+                        3<sup>rd</sup> Year
+                      </div>
+                    )}
+                    {currentYear == "4th Year" ? (
+                      <div
+                        className={
+                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                        }
+                        onClick={() => setCurrentYear("4th Year")}
+                      >
+                        4<sup>th</sup> Year
+                      </div>
+                    ) : (
+                      <div
+                        className="p-4 cursor-pointer"
+                        onClick={() => setCurrentYear("4th Year")}
+                      >
+                        4<sup>th</sup> Year
                       </div>
                     )}
                   </div>
@@ -486,7 +541,8 @@ export default function Table() {
                         AIDS Section B
                       </div>
                     )}
-                    {currentSection == "AIDS Section C" ? (
+                    {currentYear == "1st Year" || currentYear == "2nd Year" ? (
+                    currentSection == "AIDS Section C" ? (
                       <div
                         className={
                           "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
@@ -502,6 +558,8 @@ export default function Table() {
                       >
                         AIDS Section C
                       </div>
+                    )) : (
+                      <div></div>
                     )}
                     {currentSection == "IoT Section A" ? (
                       <div

@@ -382,5 +382,6 @@ export async function generatePDF(timetableData, faculty) {
   );
 
   //save the pdf
-  doc.save(`${Object.keys(timetableData)[0]}.pdf`);
+  // doc.save(`${Object.keys(timetableData)[0]}.pdf`);
+  return doc.output("blob");
 }

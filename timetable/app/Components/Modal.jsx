@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react";
-const Modal = ({ isOpen, onClose, selectedSlot }) => {
+const Modal = ({ isOpen, onClose, selectedClasss, Slot }) => {
     // const onClose = () => {
     //     // Close the modal
 
@@ -8,11 +8,12 @@ const Modal = ({ isOpen, onClose, selectedSlot }) => {
     const handleSubmit = () => {
       // Handle submission logic here (e.g., sending data to server)
       onClose();
+      console.log(selectedClasss);
     };
     // const [selectedSlot, setSelectedSlot] = useState(null); // To store the selected slot data
     const [Datee, setDateValue] = useState("");
     const [Day, setDayValue] = useState("");
-    const [Slot, setSlotValue] = useState("");
+    // const [Slot, setSlotValue] = useState("");
     const [Course, setCourseValue] = useState("");
     const [Class, setClassValue] = useState("");
     const [Syllabus, setSyllabusValue] = useState("");
@@ -38,17 +39,17 @@ const Modal = ({ isOpen, onClose, selectedSlot }) => {
           <input
             type="number"
             value={Slot}
-            onChange={(e) => setSlotValue(e.target.value)}
+            // onChange={(e) => setSlotValue(e.target.value)}
             className="border-gray-300 border rounded-lg p-2 mb-2 w-full"
             placeholder="Slot"
           />
-           <input
+           {/* <input
             type="text"
             value={Course}
             onChange={(e) => setCourseValue(e.target.value)}
             className="border-gray-300 border rounded-lg p-2 mb-2 w-full"
             placeholder="Course"
-          />
+          /> */}
            <input
             type="text"
             value={Class}
@@ -56,6 +57,7 @@ const Modal = ({ isOpen, onClose, selectedSlot }) => {
             className="border-gray-300 border rounded-lg p-2 mb-2 w-full"
             placeholder="Class"
           />
+          <input type="text" className="border-gray-300 border rounded-lg p-2 mb-2 w-full" name="" id="" value={selectedClasss}/>
            <input
             type="text"
             value={Syllabus}

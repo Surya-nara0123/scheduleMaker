@@ -105,3 +105,89 @@ CSE209,2,T,Proff28
 PSY201,2,T,Proff19
 CSE206,4,L,Proff22
 CSE210,4,L,Proff27
+3rd Year B_Tech AIDS Section A
+MTH301, 4, T, Proff29
+CSE301, 3, T, Proff30
+CSE302, 5, LT, Proff31
+CSE303, 3, T, Proff32
+CSE304, 2, T, Proff33
+PSY301, 2, T, Proff34
+CSE306, 4, L, Proff30
+CSE307, 4, L, Proff33
+3rd Year B_Tech AIDS Section B
+MTH301, 4, T, Proff29
+CSE301, 3, T, Proff30
+CSE302, 5, LT, Proff31
+CSE303, 3, T, Proff32
+CSE304, 2, T, Proff33
+PSY301, 2, T, Proff34
+CSE306, 4, L, Proff30
+CSE307, 4, L, Proff33
+3rd Year B_Tech IoT Section A
+MTH301, 4, T, Proff29
+CSE311, 3, T, Proff35
+CSE312, 3, T, Proff36
+CSE308, 3, T, Proff37
+CSE313, 3, T, Proff38
+CSE306, 4, L, Proff35
+CSE310, 4, L, Proff37
+3rd Year B_Tech IoT Section B
+MTH301, 4, T, Proff29
+CSE311, 3, T, Proff35
+CSE312, 3, T, Proff36
+CSE308, 3, T, Proff37
+CSE313, 3, T, Proff38
+CSE306, 4, L, Proff35
+CSE310, 4, L, Proff37
+3rd Year B_Tech Cyber Security
+MTH301, 3, T, Proff39
+CSE312, 3, T, Proff36
+CSE308, 3, T, Proff40
+CSE303, 5, LT, Proff41
+CSE309, 2, T, Proff42
+PSY301, 2, T, Proff34
+CSE306, 4, L, Proff36
+CSE310, 4, L, Proff40
+4th Year B_Tech AIDS Section A
+MTH401, 4, T, Proff43
+CSE401, 3, T, Proff44
+CSE402, 5, LT, Proff45
+CSE403, 3, T, Proff46
+CSE404, 2, T, Proff47
+PSY401, 2, T, Proff48
+CSE406, 4, L, Proff44
+CSE407, 4, L, Proff47
+4th Year B_Tech AIDS Section B
+MTH401, 4, T, Proff43
+CSE401, 3, T, Proff44
+CSE402, 5, LT, Proff45
+CSE403, 3, T, Proff46
+CSE404, 2, T, Proff47
+PSY401, 2, T, Proff48
+CSE406, 4, L, Proff44
+CSE407, 4, L, Proff47
+4th Year B_Tech IoT Section A
+MTH401, 4, T, Proff43
+CSE411, 3, T, Proff49
+CSE412, 3, T, Proff50
+CSE408, 3, T, Proff51
+CSE413, 3, T, Proff52
+CSE406, 4, L, Proff49
+CSE410, 4, L, Proff51
+4th Year B_Tech IoT Section B
+MTH401, 4, T, Proff43
+CSE411, 3, T, Proff49
+CSE412, 3, T, Proff50
+CSE408, 3, T, Proff51
+CSE413, 3, T, Proff52
+CSE406, 4, L, Proff49
+CSE410, 4, L, Proff51
+4th Year B_Tech Cyber Security
+MTH401, 3, T, Proff53
+CSE412, 3, T, Proff50
+CSE408, 3, T, Proff54
+CSE403, 5, LT, Proff55
+CSE409, 2, T, Proff56
+PSY401, 2, T, Proff48
+CSE406, 4, L, Proff50
+CSE410, 4, L, Proff54

@@ -8,12 +8,13 @@ const pb = new PocketBase("https://snuc.pockethost.io");
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedClass, setSelectedClass] = useState("");
+  const [selectedClass, setSelectedClass] = useState<string>("");
 
   const [proffTimetable, setProffTimetable] = useState([]);
   const [currentTab, setCurrentTab] = useState("Professor");
   const [classYear, setClassYear] = useState("");
   const [timetableData, setTimetable] = useState([]);
+  const [slot, setSlot] = useState(0);
   const year1 = [
     "8.10-9.00",
     "9.00-9.50",
@@ -36,15 +37,22 @@ export default function Home() {
     dataa: string,
     weekIndex: number,
     classIndex: number,
+    classData: string,
   ) => {
+    if(classIndex > 2)
+      setSlot(classIndex+2);
+    if(classIndex > 4)
+      setSlot(classIndex+3);
+    else
+      setSlot(classIndex+1);
     console.log(
-      `data: ${dataa}, rowIndex: ${weekIndex}, colIndex: ${classIndex}`,
+      `data: ${dataa}, rowIndex: ${weekIndex}, colIndex: ${classIndex}, classData: ${classData}`,
     );
     if (dataa === selectedClass) {
       setIsOpen(false);
       setSelectedClass("");
     } else {
-      setSelectedClass(dataa);
+      setSelectedClass(classData);
       setIsOpen(true);
     }
   };
@@ -79,7 +87,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#B4D2E7] select-none">
-      <button onClick={handleModal}>this</button>
+      {/* <button onClick={handleModal}>this</button> */}
       {loggedin ? (
         <div className="flex">
           <Sidebar />
@@ -287,7 +295,8 @@ export default function Home() {
                           <Modal
                             isOpen={isOpen}
                             onClose={handleClose}
-                            selectedSlot={proffTimetable[selectedClass]} // Adjust this based on your data structure
+                            selectedClasss={selectedClass} // Adjust this based on your data structure
+                            Slot={slot}
                           />
                         )}
                         <div className="flex items-center mb-4 rounded-lg px-2">
@@ -357,6 +366,7 @@ export default function Home() {
                                             dataa,
                                             rowIndex,
                                             colIndex,
+                                            proff[dataa][rowIndex][colIndex],
                                           );
                                         }}
                                       >

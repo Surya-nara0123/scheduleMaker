@@ -749,7 +749,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
     let check = false;
     let fallback = 0;
 
-    while (!check && fallback < 50) {
+    while (!check && fallback < 200) {
         let classes_to_courses1 = JSON.parse(JSON.stringify(classes_to_courses));
         let classes_to_courses2 = JSON.parse(JSON.stringify(classes_to_courses));
 
@@ -779,7 +779,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
         let timetable_classes_temp = {}
         let timetable_professors_temp = {}
         failsafe = 0
-        while(true && failsafe < 10){
+        while(true && failsafe < 20){
             theory_temp = JSON.parse(JSON.stringify(theory_classes));
             timetable_classes_temp = JSON.parse(JSON.stringify(timetable_classes));
             timetable_professors_temp = JSON.parse(JSON.stringify(timetable_professors));
