@@ -235,12 +235,17 @@ export default function Table() {
 
     const { class_courses, professors, proffs_names_to_short, labs } = results;
 
+    //class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable is syntax
+
     let tables = randomize(
       class_courses,
       professors,
       proffs_names_to_short,
       labs,
       parameter,
+      [],
+      {},
+      {}
     );
     if (Object.keys(tables).length === 0) {
       alert(
@@ -293,12 +298,14 @@ export default function Table() {
     // console.log(proffDetails);
     return proffDetails;
   };
+
   const genPDF = async (classTitle) => {
     let temp = {};
     let a = await convertDetails(classTitle);
     temp[classTitle] = timetableData[classTitle];
     await generatePDF(temp, a);
   };
+
   const genPDFall = async () => {
     let zip = new JSZip();
     let count = 0;
