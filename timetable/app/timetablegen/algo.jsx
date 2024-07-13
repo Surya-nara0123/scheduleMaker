@@ -461,7 +461,7 @@ function initialise_class_courses(class_courses, locked_classes) {
     return result;
 }
 
-// its in the anme
+// its in the name
 function initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable) {
     let timetable_classes_ini = {}
     let timetable_professors_ini = {}
@@ -768,6 +768,7 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
     return true;
 }
 
+// Its in the name
 function get_replacements(classes_to_courses, timetable_professors){
     let proff_replacements = {}
     for(let prof of Object.keys(timetable_professors)){
@@ -792,12 +793,14 @@ function get_replacements(classes_to_courses, timetable_professors){
 }
 
 function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable) {
+    // Initialises courses and timetables
     let classes_to_courses = initialise_class_courses(class_courses, locked_classes);
     let [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year] = initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable);
 
     let check = false;
     let fallback = 0;
 
+    // Fallbacks and all are used to avoid infinite while loops
     while (!check && fallback < 200) {
         let classes_to_courses1 = JSON.parse(JSON.stringify(classes_to_courses));
         let classes_to_courses2 = JSON.parse(JSON.stringify(classes_to_courses));
@@ -810,24 +813,32 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
         for (let [clas, courses] of Object.entries(classes_to_courses1)) {
             let lab_course = courses.filter(course => course[2] === "L");
             lab_classes[clas] = JSON.parse(JSON.stringify(lab_course));
+            // Makes a dictionary of courses with lab courses only
         }
 
         let theory_classes = {};
         for (let [clas, courses] of Object.entries(classes_to_courses1)) {
             theory_classes[clas] = courses.filter(course => course[2] === "T");
+            // Makes a dictionary of courses with theory courses only
         }
         
+        // purely for first year c programming and engineering physics MAGIC
         let class_phy_cprog_lab = {}
         let failsafe = 0
+        // Keeps on looping and assigns lab classes
         while(!is_assigned_courses(lab_classes) && failsafe < 10){
             lab_insert(lab_classes, timetable_classes, timetable_professors, timetable_labs, class_phy_cprog_lab);
             failsafe += 1;
+        }
+        if (!is_assigned_courses(lab_classes)) {
+            continue;
         }
 
         let theory_temp = {}
         let timetable_classes_temp = {}
         let timetable_professors_temp = {}
         failsafe = 0
+        // Keeps looping to add all theory classes
         while(true && failsafe < 20){
             theory_temp = JSON.parse(JSON.stringify(theory_classes));
             timetable_classes_temp = JSON.parse(JSON.stringify(timetable_classes));
@@ -849,6 +860,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
         check = verify_everything(classes_to_courses2, timetable_classes, timetable_professors_copy, timetable_labs_copy)
         if(check){
             let proff_replacements = get_replacements(classes_to_courses2, timetable_professors);
+            // Converts the lists to strings with teacher codes etc
             format_timetables(timetable_classes, timetable_professors, timetable_labs, proff_to_year, proff_to_short)
             return [timetable_classes, timetable_professors, proff_replacements, timetable_labs, classes_to_courses]
         }
