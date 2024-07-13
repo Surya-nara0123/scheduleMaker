@@ -328,7 +328,41 @@ export default function Table() {
 
   const saveTimeTable = async () => {
     console.log(timetableData);
+    const data = {
+      timetable: timetableData,
+    };
     console.log(profData);
+    const data1 = {
+      timetable: profData,
+    };
+    let timetabl = [data, data1];
+    try {
+      const response = await fetch('/api/timetable', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(timetabl),
+      });
+
+      if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Response:', data);
+  } catch (error) {
+      console.error('Error updating timetable:', error);
+  }
+
+    
+    // const record1 = await pb
+    //   .collection("timetable")
+    //   .update("gmivv6jb0cqo2m5", data1);
+
+    // const record = await pb
+    //   .collection("timetable")
+    //   .update("wizw6h9iga918ub", data);
   };
 
   const [isLoggedin, setLoggedin] = useState(false);
