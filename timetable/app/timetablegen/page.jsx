@@ -51,10 +51,17 @@ export default function Table() {
     let check = true;
 
     data.forEach((row) => {
-      if (row.length === 1) {
+      let count = 0;
+      for (let i = 0; i < row.length; i++) {
+        if (row[i] != "") {
+          count++;
+        }
+      }
+      if (count === 1) {
         currentSection = row[0].trim();
         dictionary[currentSection] = [];
       } else if (row.length === 4) {
+        // console.log(row)
         if (
           row[0] === "Course" &&
           row[1] === "Credits" &&
@@ -220,6 +227,7 @@ export default function Table() {
 
     const processFiles = [file1, file2, file3, file4];
     const results = await parseCSVFiles(processFiles);
+    // console.log(results)
 
     if (!results) {
       return;
@@ -435,23 +443,6 @@ export default function Table() {
               <>
                 <div>
                   <div className="flex ml-12 font-mono mt-3">
-                    {currentYear == "1st Year" ? (
-                      <div
-                        className={
-                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                        }
-                        onClick={() => setCurrentYear("1st Year")}
-                      >
-                        1<sup>st</sup> Year
-                      </div>
-                    ) : (
-                      <div
-                        className="p-4 cursor-pointer"
-                        onClick={() => setCurrentYear("1st Year")}
-                      >
-                        1<sup>st</sup> Year
-                      </div>
-                    )}
                     {currentYear == "2nd Year" ? (
                       <div
                         className={
@@ -541,26 +532,6 @@ export default function Table() {
                         AIDS Section B
                       </div>
                     )}
-                    {currentYear == "1st Year" || currentYear == "2nd Year" ? (
-                    currentSection == "AIDS Section C" ? (
-                      <div
-                        className={
-                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                        }
-                        onClick={() => setCurrentSection("AIDS Section C")}
-                      >
-                        AIDS Section C
-                      </div>
-                    ) : (
-                      <div
-                        className="p-4 cursor-pointer"
-                        onClick={() => setCurrentSection("AIDS Section C")}
-                      >
-                        AIDS Section C
-                      </div>
-                    )) : (
-                      <div></div>
-                    )}
                     {currentSection == "IoT Section A" ? (
                       <div
                         className={
@@ -614,7 +585,7 @@ export default function Table() {
                     )}
                   </div>
                 </div>
-                  {Object.keys(timetableData).map(
+                {Object.keys(timetableData).map(
                   (dataa, index) =>
                     dataa == (currentYear + " B_Tech " + currentSection) && (
                       <div className="md:mt-6 md:ml-14 flex flex-col items-center bg-white p-4 rounded-lg">
@@ -633,32 +604,32 @@ export default function Table() {
                           <div className="flex gap-1">
                             {index <= 5
                               ? year1.map((slot, index) => (
-                                  <div
-                                    key={index}
-                                    className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                                  >
-                                    {slot}
-                                  </div>
-                                ))
+                                <div
+                                  key={index}
+                                  className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                                >
+                                  {slot}
+                                </div>
+                              ))
                               : [
-                                  "8.10-9.00",
-                                  "9.00-9.50",
-                                  "9.50-10.40",
-                                  "break",
-                                  "11.00-11.50",
-                                  "11.50-12.40",
-                                  "Lunch",
-                                  "1.40-2.30",
-                                  "break",
-                                  "2.40-3.30",
-                                ].map((slot, index) => (
-                                  <div
-                                    key={index}
-                                    className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                                  >
-                                    {slot}
-                                  </div>
-                                ))}
+                                "8.10-9.00",
+                                "9.00-9.50",
+                                "9.50-10.40",
+                                "break",
+                                "11.00-11.50",
+                                "11.50-12.40",
+                                "Lunch",
+                                "1.40-2.30",
+                                "break",
+                                "2.40-3.30",
+                              ].map((slot, index) => (
+                                <div
+                                  key={index}
+                                  className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                                >
+                                  {slot}
+                                </div>
+                              ))}
                           </div>
                         </div>
                         <div className="flex">
@@ -680,35 +651,58 @@ export default function Table() {
                                 <>
                                   {Array.from({ length: 5 }).map(
                                     (_, rowIndex) => (
-                                      <div
-                                        key={colIndex + rowIndex}
-                                        className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
-                                      >
+                                      <>
                                         {timetableData[dataa][rowIndex][
                                           colIndex
-                                        ] != "b" &&
-                                        timetableData[dataa][rowIndex][
+                                        ] != "Break" &&
+                                          timetableData[dataa][rowIndex][
                                           colIndex
-                                        ] != "l" ? (
-                                          <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                                            {
-                                              timetableData[dataa][rowIndex][
+                                          ] != "Lunch" ? (
+                                          <div
+                                            key={colIndex + rowIndex}
+                                            className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
+                                          >{timetableData[dataa][rowIndex][
+                                            colIndex
+                                          ] != "Self-Learning" ? (
+                                            <div className="text-center w-full h-full items-center justify-center flex font-bold">
+                                              {
+                                                timetableData[dataa][rowIndex][
                                                 colIndex
-                                              ]
-                                            }
+                                                ]
+                                              }
+                                            </div>
+                                          ) : (
+                                            <div className=" text-blue-700 text-center w-full h-full items-center justify-center flex font-bold">
+                                              {
+                                                timetableData[dataa][rowIndex][
+                                                colIndex
+                                                ]
+                                              }
+                                            </div>
+                                          )}
                                           </div>
                                         ) : timetableData[dataa][rowIndex][
-                                            colIndex
-                                          ] == "b" ? (
-                                          <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                                            Break
+                                          colIndex
+                                        ] == "Break" ? (
+                                          <div
+                                            key={colIndex + rowIndex}
+                                            className="w-12 h-8 md:w-24 md:h-16 bg-[#606060] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
+                                          >
+                                            <div className="text-white text-center w-full h-full items-center justify-center flex font-bold">
+                                              Break
+                                            </div>
                                           </div>
                                         ) : (
-                                          <div className="text-center w-full h-full items-center justify-center flex font-bold">
-                                            Lunch
+                                          <div
+                                            key={colIndex + rowIndex}
+                                            className="w-12 h-8 md:w-24 md:h-16 bg-[#606060] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
+                                          >
+                                            <div className="text-white text-center w-full h-full items-center justify-center flex font-bold">
+                                              Lunch
+                                            </div>
                                           </div>
                                         )}
-                                      </div>
+                                      </>
                                     ),
                                   )}
                                 </>
@@ -716,14 +710,14 @@ export default function Table() {
                             )}
                           </div>
                         </div>
-                  <button 
-                    className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
-                    onClick={() => {
-                      genPDF(currentYear + " B_Tech " + currentSection);
-                    }}
-                  >
-                    Save
-                  </button>
+                        <button
+                          className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
+                          onClick={() => {
+                            genPDF(currentYear + " B_Tech " + currentSection);
+                          }}
+                        >
+                          Save
+                        </button>
                       </div>
                     ),
                 )}
