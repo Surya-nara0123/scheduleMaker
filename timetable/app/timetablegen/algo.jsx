@@ -871,7 +871,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
 
 export function randomize(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable) {
     try {
-        const result = get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures);
+        const result = get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable);
         return result;
     } catch (error) {
         console.error('Error generating timetables:', error);
