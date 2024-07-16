@@ -494,7 +494,7 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
 
     // Adds the classes of locked classes
     for (let clas of locked_classes) {
-        timetable_classes_ini[clas] = deepCopy(classes_initial_timetable[clas]);
+        timetable_classes_ini[clas] = JSON.parse(JSON.stringify((classes_initial_timetable[clas]));
     }
 
     for (let proff of professors) {
@@ -558,7 +558,7 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
         for (let day = 0; day < 5; day++) {
             for (let slot = 0; slot < 8; slot++) {
                 if (locked_classes.includes(proffs_initial_timetable[proff][day][slot][1])) {
-                    timetable_professors_ini[proff][day][slot] = deepCopy(proffs_initial_timetable[proff][day][slot]);
+                    timetable_professors_ini[proff][day][slot] = JSON.parse(JSON.stringify(proffs_initial_timetable[proff][day][slot]));
                 }
             }
         }
@@ -568,7 +568,7 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
         for (let day = 0; day < 5; day++) {
             for (let slot = 0; slot < 8; slot++) {
                 if (locked_classes.includes(labs_initial_timetable[lab][day][slot][1])) {
-                    timetable_labs_ini[lab][day][slot] = deepCopy(proffs_initial_timetable[proff][day][slot]);
+                    timetable_labs_ini[lab][day][slot] = JSON.parse(JSON.stringify(proffs_initial_timetable[proff][day][slot]));
                 }
             }
         }
