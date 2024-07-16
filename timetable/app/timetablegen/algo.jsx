@@ -373,7 +373,11 @@ function theory_update_1(theory_classes, timetable_classes, timetable_professors
 }
 
 // Finds empty periods and puts the class of a professor whos free, and has all their classes assigned, there and any replaces a leftover class to one of their other classes in for that class
-function theory_update_2(theory_classes, all_theory_classes, timetable_classes, timetable_professors) {
+function theory_update_2(theory_classes, all_theory_classes, timetable_classes, timetable_professors, initial_proffs, initial_lectures) {
+    let proffs_fixed = [];
+    for (let i of initial_proffs) {
+        proffs_fixed.push(i[0]);
+    }
     for (let clas of Object.keys(theory_classes)) {
         if (theory_classes[clas].length === 0) {
             continue;
@@ -386,7 +390,7 @@ function theory_update_2(theory_classes, all_theory_classes, timetable_classes, 
                         if (course[0].includes("Self-Learning") || course[2] === "L") {
                             continue;
                         }
-                        if (is_free_professor(timetable_professors, course[3], day, slot,clas)) {
+                        if (is_free_professor(timetable_professors, course[3], day, slot,clas) && !proffs_fixed.includes(course[3])) {
                             possibles.push(course)
                         }
                     }
@@ -399,7 +403,7 @@ function theory_update_2(theory_classes, all_theory_classes, timetable_classes, 
                             for (let j = 0; j < 8; j++) {
                                 if (timetable_professors[poss[3]][i][j].length === 2 && timetable_professors[poss[3]][i][j][1] == clas) {
                                     for (let course of theory_classes[clas]) {
-                                        if (is_free_professor(timetable_professors, course[3], i, j, clas)) {
+                                        if (is_free_professor(timetable_professors, course[3], i, j, clas) && !initial_lectures.includes([clas, course[0], course[3], i, j])) {
                                             replaceable.push([poss, course, i, j])
                                         }
                                     }
@@ -847,8 +851,6 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
     return true;
 }
 
-
-
 // Its in the name
 function get_replacements(classes_to_courses, timetable_professors){
     let proff_replacements = {}
@@ -926,7 +928,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
             timetable_professors_temp = JSON.parse(JSON.stringify(timetable_professors));
             theory_insert(theory_temp, timetable_classes_temp, timetable_professors_temp);
             theory_update_1(theory_temp, timetable_classes_temp, timetable_professors_temp);
-            theory_update_2(theory_temp, theory_classes, timetable_classes_temp, timetable_professors_temp);
+            theory_update_2(theory_temp, theory_classes, timetable_classes_temp, timetable_professors_temp, initial_proffs, initial_lectures);
             if (is_assigned_courses(theory_temp)) {
                 break;
             }
