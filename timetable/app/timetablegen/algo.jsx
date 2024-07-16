@@ -480,7 +480,7 @@ function initialise_class_courses(class_courses, locked_classes) {
 }
 
 // its in the name
-function initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs) {
+function initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, labs_initial_timetable, initial_proffs) {
     let timetable_classes_ini = {}
     let timetable_professors_ini = {}
     let timetable_labs_ini = {}
@@ -549,6 +549,27 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
         } else {
             for (let day = 0; day < timetable_professors_ini[proff].length; day++) {
                 timetable_professors_ini[proff][day][5] = "Lunch"
+            }
+        }
+    }
+
+    // Adds periods of locked classes to professor timetable
+    for (let proff of Object.keys(proffs_initial_timetable)) {
+        for (let day = 0; day < 5; day++) {
+            for (let slot = 0; slot < 8; slot++) {
+                if (locked_classes.includes(proffs_initial_timetable[proff][day][slot][1])) {
+                    timetable_professors_ini[proff][day][slot] = deepCopy(proffs_initial_timetable[proff][day][slot]);
+                }
+            }
+        }
+    }
+
+    for (let lab of Object.keys(labs_initial_timetable)) {
+        for (let day = 0; day < 5; day++) {
+            for (let slot = 0; slot < 8; slot++) {
+                if (locked_classes.includes(labs_initial_timetable[lab][day][slot][1])) {
+                    timetable_labs_ini[lab][day][slot] = deepCopy(proffs_initial_timetable[proff][day][slot]);
+                }
             }
         }
     }
@@ -629,17 +650,6 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
                 course[1] -= 1
                 if (course[1] == 0) {
                     classes_to_courses_temp[clas].splice(classes_to_courses_temp[clas].indexOf(course), 1);
-                }
-            }
-        }
-    }
-
-    // Adds periods of locked classes to professor timetable
-    for (let proff of Object.keys(proffs_initial_timetable)) {
-        for (let day = 0; day < 5; day++) {
-            for (let slot = 0; slot < 8; slot++) {
-                if (locked_classes.includes(proffs_initial_timetable[proff][day][slot][1])) {
-                    timetable_professors_ini[proff][day][slot] = deepCopy(proffs_initial_timetable[proff][day][slot]);
                 }
             }
         }
@@ -893,10 +903,10 @@ function get_replacements(classes_to_courses, timetable_professors){
     return proff_replacements
 }
 
-function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs) {
+function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, labs_initial_timetable, initial_proffs) {
     // Initialises courses and timetables
     let classes_to_courses = initialise_class_courses(class_courses, locked_classes);
-    let [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year, classes_to_courses_temp] = initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs);
+    let [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year, classes_to_courses_temp] = initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, labs_initial_timetable, initial_proffs);
 
     classes_to_courses = JSON.parse(JSON.stringify(classes_to_courses_temp));
     console.log(classes_to_courses_temp);
@@ -968,17 +978,16 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
         if(check){
             let proff_replacements = get_replacements(classes_to_courses2, timetable_professors);
             // Converts the lists to strings with teacher codes etc
-            format_timetables(timetable_classes, timetable_professors, timetable_labs, proff_to_year, proff_to_short)
-            return [timetable_classes, timetable_professors, proff_replacements, timetable_labs, classes_to_courses]
+            return [timetable_classes, timetable_professors, proff_replacements, timetable_labs, proff_to_year]
         }
         fallback += 1;
     }
     return {}
 }
 
-export function randomize(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs) {
+export function randomize(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, labs_initial_timetable, initial_proffs) {
     try {
-        const result = get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs);
+        const result = get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, labs_initial_timetable, initial_proffs);
         return result;
     } catch (error) {
         console.error('Error generating timetables:', error);

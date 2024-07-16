@@ -9,6 +9,109 @@ import PocketBase from "pocketbase";
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
+function format_timetables(timetable_classes, timetable_professors, timetable_labs, proff_to_year, proff_to_short){
+    for(let clas of Object.keys(timetable_classes)){
+        if(clas.slice(0,1) === "1"){
+            for(let day = 0; day < 5; day++){
+                timetable_classes[clas][day].splice(2, 0, "Break")
+                timetable_classes[clas][day].splice(8, 0, "Break")
+            }
+        } else {
+            for(let day = 0; day < 5; day++){
+                timetable_classes[clas][day].splice(3, 0, "Break")
+                timetable_classes[clas][day].splice(8, 0, "Break")
+            }
+        }
+    }
+    for(let prof of Object.keys(timetable_professors)){
+        if(proff_to_year[prof] === "1"){
+            for(let day = 0; day < 5; day++){
+                timetable_professors[prof][day].splice(2, 0, "Break")
+                timetable_professors[prof][day].splice(8, 0, "Break")
+            }
+        } else if(proff_to_year[prof] === "2") {
+            for(let day = 0; day < 5; day++){
+                timetable_professors[prof][day].splice(3, 0, "Break")
+                timetable_professors[prof][day].splice(8, 0, "Break")
+            }
+        } else {
+            for(let day = 0; day < 5; day++){
+                if(timetable_professors[prof][day][2] === ""){
+                    timetable_professors[prof][day].splice(2, 0, "Break")
+                } else if (timetable_professors[prof][day][2][1].slice(0,1) === "1"){
+                    timetable_professors[prof][day].splice(2, 0, "Break")
+                } else {
+                    timetable_professors[prof][day].splice(3, 0, "Break")
+                }
+                timetable_professors[prof][day].splice(8, 0, "Break")
+            }
+        }
+    }
+
+    for(let clas of Object.keys(timetable_classes)){
+        for(let day = 0; day < 5; day++){
+            for(let slot = 0; slot < timetable_classes[clas][day].length; slot++){
+                if(typeof timetable_classes[clas][day][slot] === typeof "string"){
+                    continue
+                } else {
+                    if(timetable_classes[clas][day][slot][0].includes("Self-Learning")){
+                        timetable_classes[clas][day][slot] = "Self-Learning"
+                    } else {
+                        let result = ""
+                        for(let i of timetable_classes[clas][day][slot]){
+                            if(proff_to_short[i]){
+                                result += proff_to_short[i];
+                            } else {
+                                result += i;
+                            }
+                            result += " "
+                        }
+                        timetable_classes[clas][day][slot] = result
+                    }
+                }
+            }
+        }
+    }
+
+    for(let prof of Object.keys(timetable_professors)){
+        for(let day = 0; day < 5; day++){
+            for(let slot = 0; slot < timetable_professors[prof][day].length; slot++){
+                if(typeof timetable_professors[prof][day][slot] === typeof "string"){
+                    continue
+                } else {
+                    let result = ""
+                    for(let i of timetable_professors[prof][day][slot]){
+                        result += i
+                        result += " "
+                    }
+                    timetable_professors[prof][day][slot] = result
+                }
+            }
+        }
+    }
+
+    for(let lab of Object.keys(timetable_labs)){
+        for(let day = 0; day < 5; day++){
+            for(let slot = 0; slot < timetable_labs[lab][day].length; slot++){
+                if(typeof timetable_labs[lab][day][slot] === typeof "string"){
+                    continue
+                } else {
+                    let result = ""
+                    for(let i of timetable_labs[lab][day][slot]){
+                        result += i
+                        result += " "
+                    }
+                    timetable_labs[lab][day][slot] = result
+                }
+            }
+        }
+    }
+}
+
+let fixed_classes = [];
+let timetable_classes = {};
+let timetable_professors = {};
+let timetable_labs = {};
 
 const pb = new PocketBase("https://snuc.pockethost.io");
 
@@ -220,9 +323,10 @@ export default function Table() {
       proffs_names_to_short,
       labs,
       parameter,
-      [],
-      {},
-      {},
+      fixed_classes,
+      timetable_professors,
+      timetable_classes,
+      timetable_labs,
       [["Mr.Prawin Raj", [2,3], [0,1,2,3,4,6,7]]]
     );
     if (Object.keys(tables).length === 0) {
@@ -231,6 +335,10 @@ export default function Table() {
       );
       return;
     }
+    timetable_professors = JSON.parse(JSON.stringify(tables[0]));
+    timetable_classes = JSON.parse(JSON.stringify(tables[1]));
+    timetable_labs = JSON.parse(JSON.stringify(tables[3]));
+    format_timetables(tables[0], tables[1], tables[3], tables[4], proffs_names_to_short);
     let a = tables[0];
     let b = tables[1];
     setTable(a);
