@@ -33,7 +33,6 @@ export default function Table() {
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
   const [file3, setFile3] = useState(null);
-  const [file4, setFile4] = useState(null);
   const [profData, setProfData] = useState([]);
   const [parameter, setParameter] = useState([]);
 
@@ -118,22 +117,6 @@ export default function Table() {
     }
     return proffs_to_short;
   };
-
-  const createList_proffs = (data) => {
-    const proffs_names = [];
-    let check = true;
-    data.forEach((row) => {
-      if (row.length != 1) {
-        check = false;
-        return;
-      }
-      proffs_names.push(row[0]);
-    });
-    if (!check) {
-    }
-    return proffs_names;
-  };
-
   const parseCSVFiles = async (files) => {
     let done_files = new Set();
     let results = [];
@@ -168,9 +151,6 @@ export default function Table() {
                   dictionary = createList_labs(data);
                   break;
                 case 2:
-                  dictionary = createList_proffs(data);
-                  break;
-                case 3:
                   dictionary = creatDictionary_proff(data);
                   break;
                 default:
@@ -195,7 +175,6 @@ export default function Table() {
     }
 
     let class_courses = {};
-    let professors = [];
     let proffs_names_to_short = {};
     let labs = [];
 
@@ -210,22 +189,20 @@ export default function Table() {
       } else if (Array.isArray(thing)) {
         if (thing[0].includes("LAB")) {
           labs = JSON.parse(JSON.stringify(thing));
-        } else {
-          professors = JSON.parse(JSON.stringify(thing));
         }
       }
     });
-
+    let professors = Object.keys(proffs_names_to_short);
     return { class_courses, professors, proffs_names_to_short, labs };
   };
 
   const printOutput = async () => {
-    if (!(file1 && file2 && file3 && file4)) {
+    if (!(file1 && file2 && file3)) {
       alert("Please upload all 4 CSV files.");
       return;
     }
 
-    const processFiles = [file1, file2, file3, file4];
+    const processFiles = [file1, file2, file3];
     const results = await parseCSVFiles(processFiles);
     // console.log(results)
 
@@ -245,7 +222,8 @@ export default function Table() {
       parameter,
       [],
       {},
-      {}
+      {},
+      [['Mr.Prawin Raj', [2,3], [0,1,2,3,4,6,7]]]
     );
     if (Object.keys(tables).length === 0) {
       alert(
@@ -267,12 +245,12 @@ export default function Table() {
   };
 
   const convertDetails = async (classTitle) => {
-    if (!(file1 && file2 && file3 && file4)) {
+    if (!(file1 && file2 && file3)) {
       alert("Please upload all 4 CSV files.");
       return;
     }
 
-    const processFiles = [file1, file2, file3, file4];
+    const processFiles = [file1, file2, file3];
     const results = await parseCSVFiles(processFiles);
 
     if (!results) {
@@ -303,31 +281,73 @@ export default function Table() {
     let temp = {};
     let a = await convertDetails(classTitle);
     temp[classTitle] = timetableData[classTitle];
-    await generatePDF(temp, a);
+    const pdf = await generatePDF(temp, a);
+    const blob = new Blob([pdf], { type: "application/pdf" });
+    saveAs(blob, classTitle + ".pdf");
   };
 
   const genPDFall = async () => {
-    let zip = new JSZip();
-    let count = 0;
-    for (let key in timetableData) {
-      let temp = {};
-      let a = convertDetails(key);
-      temp[key] = timetableData[key];
-      let pdf = await generatePDF(temp, a);
-      zip.file(key + ".pdf", pdf);
-      count++;
+    // let zip = new JSZip();
+    // let count = 0;
+    // for (let key in timetableData) {
+    //   let temp = {};
+    //   let a = convertDetails(key);
+    //   temp[key] = timetableData[key];
+    //   let pdf = await generatePDF(temp, a);
+    //   zip.file(key + ".pdf", pdf);
+    //   count++;
+    // }
+    // if (count == 0) {
+    //   alert("No Timetables to save");
+    //   return;
+    // }
+    // zip.generateAsync({ type: "blob" }).then(function (content) {
+    //   saveAs(content, "Timetables.zip");
+    // });
+    function jsonToCsv(jsonObj) {
+      // Extract headers
+      const headers = Object.keys(jsonObj[Object.keys(jsonObj)[0]][0]);
+
+      // Create a CSV string
+      let csv = headers.join(',') + '\n';
+
+      // Iterate over each section
+      for (const section in jsonObj) {
+        csv += section + '\n'
+        jsonObj[section].forEach(row => {
+          csv += Object.values(row).map(value => {
+            // Escape commas and quotes
+            if (typeof value === 'string') {
+              value = value.replace(/"/g, '""');
+              if (value.search(/("|,|\n)/g) >= 0) value = `"${value}"`;
+            }
+            return value;
+          }).join(',') + '\n';
+        });
+      }
+      console.log(csv);
+      return csv;
     }
-    if (count == 0) {
-      alert("No Timetables to save");
-      return;
+
+    function downloadCsv(csv, filename) {
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
     }
-    zip.generateAsync({ type: "blob" }).then(function (content) {
-      saveAs(content, "Timetables.zip");
-    });
+
+    let csv = jsonToCsv(timetableData);
+    downloadCsv(csv, 'timetable.csv');
+
   };
 
   const saveTimeTable = async () => {
-    console.log(timetableData);
+    console.log("timetable", timetableData);
     const data = {
       timetable: timetableData,
     };
@@ -338,24 +358,24 @@ export default function Table() {
     let timetabl = [data, data1];
     try {
       const response = await fetch('/api/timetable', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(timetabl),
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(timetabl),
       });
 
       if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
       const data = await response.json();
       console.log('Response:', data);
-  } catch (error) {
+    } catch (error) {
       console.error('Error updating timetable:', error);
-  }
+    }
 
-    
+
     // const record1 = await pb
     //   .collection("timetable")
     //   .update("gmivv6jb0cqo2m5", data1);
@@ -366,8 +386,9 @@ export default function Table() {
   };
 
   const [isLoggedin, setLoggedin] = useState(false);
-  const [currentYear, setCurrentYear] = useState("1st Year");
+  const [currentYear, setCurrentYear] = useState("2nd Year");
   const [currentSection, setCurrentSection] = useState("AIDS Section A");
+  const [lockedClasses, setLockedClasses] = useState([]);
 
   useEffect(() => {
     const model = pb.authStore.model;
@@ -414,21 +435,12 @@ export default function Table() {
                   />
                 </div>
                 <div className="w-full md:w-auto mb-4">
-                  <label className="block mb-2">Professors Names</label>
+                  <label className="block mb-2">Professors Shortforms</label>
                   <input
                     className="rounded-lg p-2 w-full"
                     type="file"
                     accept=".csv"
                     onChange={(e) => handleFileChange(e, setFile3)}
-                  />
-                </div>
-                <div className="w-full md:w-auto mb-4">
-                  <label className="block mb-2">Professor's Shortform</label>
-                  <input
-                    className="rounded-lg p-2 w-full"
-                    type="file"
-                    accept=".csv"
-                    onChange={(e) => handleFileChange(e, setFile4)}
                   />
                 </div>
               </div>
@@ -607,23 +619,24 @@ export default function Table() {
                         IoT Section B
                       </div>
                     )}
-                    {currentSection == "Cyber Security" ? (
-                      <div
-                        className={
-                          "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
-                        }
-                        onClick={() => setCurrentSection("Cyber Security")}
-                      >
-                        Cyber Security
-                      </div>
-                    ) : (
-                      <div
-                        className="p-4 cursor-pointer"
-                        onClick={() => setCurrentSection("Cyber Security")}
-                      >
-                        Cyber Security
-                      </div>
-                    )}
+                    {currentYear != "4th Year" ?
+                      currentSection == "Cyber Security" ? (
+                        <div
+                          className={
+                            "p-4 cursor-pointer bg-[#f8f8f8] bg-opacity-25 border-b-2 border-black"
+                          }
+                          onClick={() => setCurrentSection("Cyber Security")}
+                        >
+                          Cyber Security
+                        </div>
+                      ) : (
+                        <div
+                          className="p-4 cursor-pointer"
+                          onClick={() => setCurrentSection("Cyber Security")}
+                        >
+                          Cyber Security
+                        </div>
+                      ) : <></>}
                   </div>
                 </div>
                 {Object.keys(timetableData).map(
@@ -751,14 +764,26 @@ export default function Table() {
                             )}
                           </div>
                         </div>
-                        <button
-                          className="bg-blue-500 p-3 rounded-lg ml-auto mt-3 mr-2"
-                          onClick={() => {
-                            genPDF(currentYear + " B_Tech " + currentSection);
-                          }}
-                        >
-                          Save
-                        </button>
+                        <div className="flex mt-4 ml-auto">
+                          <button
+                            className="bg-red-500 p-3 rounded-lg mt-3 mr-2"
+                            onClick={() => {
+                              setLockedClasses(
+                                () => [...lockedClasses, dataa],
+                              )
+                            }}
+                          >
+                            Fix
+                          </button>
+                          <button
+                            className="bg-blue-500 p-3 rounded-lg mt-3 mr-2"
+                            onClick={() => {
+                              genPDF(currentYear + " B_Tech " + currentSection);
+                            }}
+                          >
+                            Save
+                          </button>
+                        </div>
                       </div>
                     ),
                 )}

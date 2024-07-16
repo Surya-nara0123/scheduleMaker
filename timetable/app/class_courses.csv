@@ -1,0 +1,130 @@
+Course,Credits,Type,Professor
+2nd Year B_Tech AIDS Section A
+MA2003,4,T,Dr.Prasanna Lakshmi
+CS2003,3,T,Dr.Surya K
+CS2701,5,LT,Mr.Mahendra Kumar
+CS2007,3,T,Mr.Prawin Raj
+CS2009,3,T,Dr.Debajyoti Biswas
+HS2001,1,T,NPTEL
+CS2803,4,L,Dr.Surya K
+CS2805,4,L,Dr.Debajyoti Biswas
+2nd Year B_Tech AIDS Section B
+MA2003,4,T,Dr.Joji Benny
+CS2003,3,T,Dr.Surya K
+CS2701,5,LT,Mr.Mahendra Kumar
+CS2007,3,T,Mr.Prawin Raj
+CS2009,3,T,Dr.Debajyoti Biswas
+HS2001,1,T,NPTEL
+CS2803,4,L,Dr.Surya K
+CS2805,4,L,Dr.Debajyoti Biswas
+2nd Year B_Tech IoT Section A
+MA2001,4,T,Mr.Sumangal Bhattacharya
+CS1006T,3,T,Dr.Subin Sahayam
+CS2003,3,T,Dr.Shambhu saran
+CS2001T,3,T,Dr.Veeramani Sonai
+CS2005,3,T,Dr.Pradeep Balaji
+CS1804T,4,L,Dr.Subin Sahayam
+CS2801T,4,L,Dr.Veeramani Sonai
+2nd Year B_Tech IoT Section B
+MA2001,4,T,Dr.Joji Benny
+CS1006T,3,T,Dr.Subin Sahayam
+CS2003,3,T,Dr.Shambhu saran
+CS2001T,3,T,Dr.Veeramani Sonai
+CS2005,3,T,Dr.Pradeep Balaji
+CS1804T,4,L,Dr.Subin Sahayam
+CS2801T,4,L,Dr.Veeramani Sonai
+2nd Year B_Tech Cyber Security
+MA2003,4,T,Mr.Sumangal Bhattacharya
+CS2003,3,T,Dr.Shambhu saran
+CS2701,3,T,Dr.U Padmavathi
+CS2001T,3,T,Ms.Divya Stephen
+CS2011,2,T,Dr.Dhayalkumar M
+HS2001,1,T,NPTEL
+CS2803,4,L,Dr.Shambhu saran
+CS2801T,4,L,Dr.Vidhusha S
+CS2701,2,L,Dr.U Padmavathi
+3rd Year B_Tech AIDS Section A
+MA3001,3,T,K.Deepa
+CS3005,3,T,Mr.Aldrin Rayen
+CS3701,5,LT,Mr.Pown Raj
+CS3007,3,T,Dr.Chandrakala S
+BM3003,3,T,NPTEL
+CS3011,3,T,Dr.Dinesh G
+CS3009,1,T,Dr.Nagarajan T
+CS3807,4,L,Dr.Shikha Marwaha
+CS3801,4,L,Mr.Aldrin Rayen
+3rd Year B_Tech AIDS Section B
+MA3001,3,T,Dr.Joji Benny
+CS3005,3,T,Mr.Aldrin Rayen
+CS3701,5,LT,Mr.Pown Raj
+CS3007,3,T,Dr.Chandrakala S
+BM3003,3,T,NPTEL
+CS3011,3,T,Dr.Dinesh G
+CS3009,1,T,Dr.Nagarajan T
+CS3807,4,L,Dr.Shikha Marwaha
+CS3801,4,L,Mr.Aldrin Rayen
+3rd Year B_Tech IoT Section A
+CS2007,3,T,Ms.Divya Stephen
+CS3005,3,T,Dr.Amsaprabhaa M
+CS3003,3,T,Dr.Rohit Kumar
+CS3001,1,T,Dr.Vidhusha S
+CS3699T,2,T,Dr.U Padmavathi
+MA1501,3,T,Dr.R Sujatha
+CS3801,4,L,Dr.Amsaprabhaa M
+CS3805,4,L,Ms.Divya Stephen
+CS3803,4,L,Dr.Rohit Kumar
+3rd Year B_Tech IoT Section B
+CS2007,3,T,Ms.Divya Stephen
+CS3005,3,T,Dr.Amsaprabhaa M
+CS3003,3,T,Dr.Rohit Kumar
+CS3001,1,T,Dr.Vidhusha S
+CS3699T,2,T,Dr.U Padmavathi
+MA1501,3,T,Mr.Sumangal Bhattacharya
+CS3801,4,L,Dr.Amsaprabhaa M
+CS3805,4,L,Ms.Divya Stephen
+CS3803,4,L,Dr.Rohit Kumar
+3rd Year B_Tech Cyber Security
+MA3001,3,T,Dr.Joji Benny
+CS3015,3,T,Dr.Kandappan VA
+CS2007,3,T,Dr.Santhi Natarajan
+CS3013,3,T,Adjunct Faculty 1
+BM3003,2,T,NPTEL
+CS3687,3,T,Dr.Sundharakumar KB
+CS3809,4,L,Adjunct Faculty 1
+CS3811,3,L,Dr.Kandappan VA
+4th Year B_Tech AIDS Section A
+CS4007,3,T,Dr.Sundharakumar KB
+CS4009,3,T,Dr.Anushya Raechel
+CS3689,3,T,Dr.S Sathyanarayanan
+CS4679,3,T,Dr.Santhi Natarajan
+CSxxxx,3,T,NPTEL
+CS4803,3,L,Dr.Sundharakumar KB/Dr.Kandappan VA
+CS4997,2,L,Dr.Santhi Natarajan
+4th Year B_Tech AIDS Section B
+CS4007,3,T,Dr.Sundharakumar KB
+CS4009,3,T,Dr.Anushya Raechel
+CS3689,3,T,Dr.S Sathyanarayanan
+CS4679,3,T,Dr.Santhi Natarajan
+CSxxxx,3,T,NPTEL
+CS4803,3,L,Dr.Sundharakumar KB/Dr.Kandappan VA
+CS4997,2,L,Dr.Santhi Natarajan
+4th Year B_Tech IoT Section A
+CS4005,3,T,Adjunct Faculty 1
+CS4001,3,T,Mr.Pown Raj
+CS4003,3,T,Ms.Divya Subbaram
+BM4001,2,T,Dr.M.S Devi
+XXXXXX,1,T,New Faculty 1
+CS4691,3,T,Dr.Kandappan VA
+CS4852,1,L,Mr.Pown Raj
+CS4801,4,L,Ms.Divya Subbaram
+CS4999,4,L,Dr.Sundharakumar KB
+4th Year B_Tech IoT Section B
+CS4005,3,T,Adjunct Faculty 1
+CS4001,3,T,Mr.Pown Raj
+CS4003,3,T,Ms.Divya Subbaram
+BM4001,2,T,Dr.M.S Devi
+XXXXXX,1,T,New Faculty 1
+CS4691,3,T,Dr.Kandappan VA
+CS4852,1,L,Mr.Pown Raj
+CS4801,4,L,Ms.Divya Subbaram
+CS4999,4,L,Dr.Sundharakumar KB

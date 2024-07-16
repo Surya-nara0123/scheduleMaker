@@ -24,8 +24,22 @@ function shuffle_array(array) {
 }
 
 //Checks if a professor is free on a specific day and slot
-function is_free_professor(timetable_professors, proff, day, slot) {
-    return timetable_professors[proff][day][slot] === ""
+function is_free_professor(timetable_professors, proff, day, slot, clas) {
+    if (timetable_professors[proff][day][slot] === ""){
+        let clas_count = 0
+        let period_count = 0;
+        for (let i = 0; i < slot; i++) {
+            if (typeof timetable_professors[proff][day][i] === typeof "Lunch") {
+                continue;
+            }
+            if (timetable_professors[proff][day][i][1] === clas) {
+                clas_count += 1;
+            }
+            period_count += 1;
+        }
+        return clas_count < 3 && period_count < 6;
+    }
+    return false
 }
 
 
@@ -81,7 +95,7 @@ function lab_insert(lab_classes, timetable_classes, timetable_professors, timeta
                 for (let lab_course of lab_classes[clas]) {
                     let check = true;
                     for (let i = 0; i < lab_course[1]; i++) {
-                        if ((slot + i) >= 8 || timetable_classes[clas][day][slot + i] != "" || !is_free_professor(timetable_professors, lab_course[3], day, slot + i)) {
+                        if ((slot + i) >= 8 || timetable_classes[clas][day][slot + i] != "" || !is_free_professor(timetable_professors, lab_course[3], day, slot + i, clas)) {
                             check = false;
                             break
                         }
@@ -231,7 +245,7 @@ function theory_insert(theory_classes, timetable_classes, timetable_professors) 
                 }
                 let possibles = []
                 for (let course of theory_classes[clas]) {
-                    if (is_free_professor(timetable_professors, course[3], day, slot)) {
+                    if (is_free_professor(timetable_professors, course[3], day, slot, clas)) {
                         possibles.push(course);
                     }
                 }
@@ -315,7 +329,7 @@ function theory_update_1(theory_classes, timetable_classes, timetable_professors
                 if (timetable_classes[clas][day][slot][0].includes("Self-Learning")) {
                     let possibles = [];
                     for (let course of theory_classes[clas]) {
-                        if (is_free_professor(timetable_professors, course[3], day, slot)) {
+                        if (is_free_professor(timetable_professors, course[3], day, slot, clas)) {
                             possibles.push(course);
                         }
                     }
@@ -372,7 +386,7 @@ function theory_update_2(theory_classes, all_theory_classes, timetable_classes, 
                         if (course[0].includes("Self-Learning") || course[2] === "L") {
                             continue;
                         }
-                        if (is_free_professor(timetable_professors, course[3], day, slot)) {
+                        if (is_free_professor(timetable_professors, course[3], day, slot,clas)) {
                             possibles.push(course)
                         }
                     }
@@ -385,7 +399,7 @@ function theory_update_2(theory_classes, all_theory_classes, timetable_classes, 
                             for (let j = 0; j < 8; j++) {
                                 if (timetable_professors[poss[3]][i][j].length === 2 && timetable_professors[poss[3]][i][j][1] == clas) {
                                     for (let course of theory_classes[clas]) {
-                                        if (is_free_professor(timetable_professors, course[3], i, j)) {
+                                        if (is_free_professor(timetable_professors, course[3], i, j, clas)) {
                                             replaceable.push([poss, course, i, j])
                                         }
                                     }
@@ -462,7 +476,7 @@ function initialise_class_courses(class_courses, locked_classes) {
 }
 
 // its in the name
-function initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable) {
+function initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs) {
     let timetable_classes_ini = {}
     let timetable_professors_ini = {}
     let timetable_labs_ini = {}
@@ -535,6 +549,56 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
         }
     }
 
+    console.log(initial_proffs);
+    for (let i of initial_proffs) {
+        let proff = i[0];
+        let days = i[1];
+        let slots = i[2];
+        let possible_slots = [];
+        for (let day of days) {
+            console.log(day);
+            for (let slot of slots) {
+                console.log(slot);
+                possible_slots.push([day, slot]);
+            }
+        }
+        let proff_courses = [];
+        for (let clas of Object.keys(classes_to_courses)) {
+            for (let course of classes_to_courses[clas]) {
+                if (course[3] === proff) {
+                    proff_courses.push([clas, course]);
+                }
+            }
+        }
+        console.log(proff_courses);
+        for (let period of possible_slots) {
+            let possible = [];
+            for (let classes of proff_courses) {
+                if (is_free_professor(timetable_professors_ini, proff, period[0], period[1], classes[0]) && timetable_classes_ini[classes[0]][period[0]][period[1]].length == 0) {
+                    possible.push(classes);
+                }
+            }
+            if (possible.length == 0) {
+                continue;
+            }
+            console.log(possible);
+            console.log("hello");
+            let choice = possible[make_random() % possible.length];
+            console.log("lol")
+            timetable_classes_ini[choice[0]][period[0]][period[1]] = [choice[1][0], proff];
+            console.log(timetable_classes_ini[choice[0]][period[0]][period[1]]);
+            timetable_professors_ini[proff][period[0]][period[1]] = [choice[1][0], choice[0]];
+            for (course in classes_to_courses[choice[0]]) {
+                if (course[0] == choice[1][0]) {
+                    course[1] -= 1;
+                    if (course[1] == 0) {
+                        classes_to_courses[choice[0]].splice(classes_to_courses[choice[0]].indexOf(course), 1);
+                    }
+                }
+            }
+        }
+    }
+
     let temp = JSON.parse(JSON.stringify(initial_lectures))
 
     for (let lecture of temp) {
@@ -543,7 +607,7 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
             continue;
         }
         for (let course of classes_to_courses[clas]) {
-            if (course[0] == course_code && course[3] == proff && course[2] == "T" && timetable_classes_ini[clas][day][slot] == "" && is_free_professor(timetable_professors_ini, proff, day, slot)) {
+            if (course[0] == course_code && course[3] == proff && course[2] == "T" && timetable_classes_ini[clas][day][slot] == "" && is_free_professor(timetable_professors_ini, proff, day, slot, clas)) {
                 timetable_classes_ini[clas][day][slot] = [course_code, proff]
                 timetable_professors_ini[proff][day][slot] = [course_code, clas]
                 initial_lectures.splice(initial_lectures.indexOf(lecture), 1);
@@ -676,6 +740,7 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
             let self_count = 0;
             for (let slot = 0; slot < 8; slot++) {
                 if (timetable_classes[clas][day][slot] === "") {
+                    console.log(`Class ${clas}, Day ${day}, Slot ${slot}: Empty slot`);
                     return false;
                 }
 
@@ -689,6 +754,7 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
                     if (temp[0].includes("Self-Learning")) {
                         self_count += 1;
                         if (self_count > 3) {
+                            console.log(`Class ${clas}, Day ${day}, Slot ${slot}: Too many self-learning periods`);
                             return false;
                         }
                         for (let i = 0; i < classes_to_courses[clas].length; i++) {
@@ -700,6 +766,8 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
                         continue;
                     }
                     if (timetable_professors[temp[1]][day][slot][0] != temp[0] || timetable_professors[temp[1]][day][slot][1] != clas) {
+                        console.log(`Class ${clas}, Day ${day}, Slot ${slot}: Professor mismatch for ${temp}`);
+                        console.log(`Professor slot content: ${timetable_professors[temp[1]][day][slot]}`);
                         return false;
                     }
                     timetable_professors[temp[1]][day][slot] = "";
@@ -716,6 +784,9 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
                 } else if (temp[0].includes("ECE")) {
                     if (timetable_labs[temp[2]][day][slot][0] != temp[0] || timetable_labs[temp[2]][day][slot][1] != clas || timetable_labs[temp[2]][day][slot][2] != temp[1] ||
                         timetable_professors[temp[1]][day][slot][0] != temp[0] || timetable_professors[temp[1]][day][slot][1] != clas || timetable_professors[temp[1]][day][slot][2] != temp[2]) {
+                        console.log(`Class ${clas}, Day ${day}, Slot ${slot}: Lab or professor mismatch for ECE ${temp}`);
+                        console.log(`Lab slot content: ${timetable_labs[temp[2]][day][slot]}`);
+                        console.log(`Professor slot content: ${timetable_professors[temp[1]][day][slot]}`);
                         return false;
                     }
                     timetable_professors[temp[1]][day][slot] = "";
@@ -725,6 +796,10 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
                         timetable_labs[temp[3]][day][slot][0] != temp[0] || timetable_labs[temp[3]][day][slot][1] != clas || timetable_labs[temp[3]][day][slot][2] != temp[1] ||
                         timetable_professors[temp[1]][day][slot][0] != temp[0] || timetable_professors[temp[1]][day][slot][1] != clas || timetable_professors[temp[1]][day][slot][2] != temp[2] ||
                         timetable_professors[temp[1]][day][slot][3] != temp[3]) {
+                        console.log(`Class ${clas}, Day ${day}, Slot ${slot}: Lab or professor mismatch for ${temp}`);
+                        console.log(`Lab slot content 1: ${timetable_labs[temp[2]][day][slot]}`);
+                        console.log(`Lab slot content 2: ${timetable_labs[temp[3]][day][slot]}`);
+                        console.log(`Professor slot content: ${timetable_professors[temp[1]][day][slot]}`);
                         return false;
                     }
                     timetable_professors[temp[1]][day][slot] = "";
@@ -735,6 +810,11 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
                         timetable_labs[temp[5]][day][slot][0] != temp[1] || timetable_labs[temp[5]][day][slot][1] != clas || timetable_labs[temp[5]][day][slot][2] != temp[3] ||
                         timetable_professors[temp[2]][day][slot][0] != temp[0] || timetable_professors[temp[2]][day][slot][1] != clas || timetable_professors[temp[2]][day][slot][2] != temp[4] ||
                         timetable_professors[temp[3]][day][slot][0] != temp[1] || timetable_professors[temp[3]][day][slot][1] != clas || timetable_professors[temp[3]][day][slot][2] != temp[5]) {
+                        console.log(`Class ${clas}, Day ${day}, Slot ${slot}: Lab or professor mismatch for ${temp}`);
+                        console.log(`Lab slot content 1: ${timetable_labs[temp[4]][day][slot]}`);
+                        console.log(`Lab slot content 2: ${timetable_labs[temp[5]][day][slot]}`);
+                        console.log(`Professor slot content 1: ${timetable_professors[temp[2]][day][slot]}`);
+                        console.log(`Professor slot content 2: ${timetable_professors[temp[3]][day][slot]}`);
                         return false;
                     }
                     timetable_professors[temp[2]][day][slot] = "";
@@ -745,11 +825,15 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
             }
         }
     }
+
+    console.log("hello");
     
     for (let proff of Object.keys(timetable_professors)) {
         for (let day = 0; day < 5; day++) {
             for (let slot = 0; slot < 8; slot++) {
                 if (timetable_professors[proff][day][slot] != "" && timetable_professors[proff][day][slot] != "Lunch") {
+                    console.log(`Professor ${proff}, Day ${day}, Slot ${slot}: Non-empty slot`);
+                    console.log(`Slot content: ${timetable_professors[proff][day][slot]}`);
                     return false;
                 }
             }
@@ -758,8 +842,10 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
     
     for (let lab of Object.keys(timetable_labs)) {
         for (let day = 0; day < 5; day++) {
-            for (let slot = 0;  slot < 8; slot++) {
+            for (let slot = 0; slot < 8; slot++) {
                 if (timetable_labs[lab][day][slot] != "") {
+                    console.log(`Lab ${lab}, Day ${day}, Slot ${slot}: Non-empty slot`);
+                    console.log(`Slot content: ${timetable_labs[lab][day][slot]}`);
                     return false;
                 }
             }
@@ -767,6 +853,8 @@ function verify_everything(classes_to_courses, timetable_classes, timetable_prof
     }
     return true;
 }
+
+
 
 // Its in the name
 function get_replacements(classes_to_courses, timetable_professors){
@@ -781,7 +869,7 @@ function get_replacements(classes_to_courses, timetable_professors){
                 let clas = timetable_professors[prof][day][slot][1]
                 let replacements = []
                 for(let course of classes_to_courses[clas]){
-                    if(is_free_professor(timetable_professors, course[3], day, slot)){
+                    if(is_free_professor(timetable_professors, course[3], day, slot, clas)){
                         replacements.push(course[3])
                     }
                 }
@@ -792,10 +880,10 @@ function get_replacements(classes_to_courses, timetable_professors){
     return proff_replacements
 }
 
-function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable) {
+function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs) {
     // Initialises courses and timetables
     let classes_to_courses = initialise_class_courses(class_courses, locked_classes);
-    let [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year] = initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable);
+    let [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year] = initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs);
 
     let check = false;
     let fallback = 0;
@@ -851,6 +939,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
             }
             failsafe += 1
         }
+        console.log(failsafe, fallback)
         timetable_classes = JSON.parse(JSON.stringify(timetable_classes_temp));
         timetable_professors = JSON.parse(JSON.stringify(timetable_professors_temp));
         theory_classes = JSON.parse(JSON.stringify(theory_temp));
@@ -858,6 +947,7 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
         let timetable_professors_copy = JSON.parse(JSON.stringify(timetable_professors_temp));
         let timetable_labs_copy = JSON.parse(JSON.stringify(timetable_labs));
         check = verify_everything(classes_to_courses2, timetable_classes, timetable_professors_copy, timetable_labs_copy)
+        console.log(check)
         if(check){
             let proff_replacements = get_replacements(classes_to_courses2, timetable_professors);
             // Converts the lists to strings with teacher codes etc
@@ -869,9 +959,9 @@ function get_timetables(class_courses, professors, proff_to_short, labs, initial
     return {}
 }
 
-export function randomize(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable) {
+export function randomize(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs) {
     try {
-        const result = get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable);
+        const result = get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs);
         return result;
     } catch (error) {
         console.error('Error generating timetables:', error);
