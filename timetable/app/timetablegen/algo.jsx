@@ -553,6 +553,8 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
         }
     }
 
+    let classes_to_courses_temp = JSON.parse(JSON.stringify(classes_to_courses));
+
     for (let i of initial_proffs) {
         let proff = i[0];
         let days = i[1];
@@ -565,12 +567,13 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
         }
         let proff_courses = [];
         for (let clas of Object.keys(classes_to_courses)) {
-            for (let course of classes_to_courses[clas]) {
+            for (let course of classes_to_courses_temp[clas]) {
                 if (course[3] === proff) {
                     proff_courses.push([clas, course]);
                 }
             }
         }
+        shuffle_array(possible_slots);
         for (let period of possible_slots) {
             let possible = [];
             for (let classes of proff_courses) {
@@ -585,11 +588,26 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
             let choice = possible[make_random() % possible.length];
             timetable_classes_ini[choice[0]][period[0]][period[1]] = [choice[1][0], proff];
             timetable_professors_ini[proff][period[0]][period[1]] = [choice[1][0], choice[0]];
-            for (let course in classes_to_courses[choice[0]]) {
+            for (let course of classes_to_courses_temp[choice[0]]) {
                 if (course[0] == choice[1][0]) {
+                    console.log("here");
                     course[1] -= 1;
                     if (course[1] == 0) {
-                        classes_to_courses[choice[0]].splice(classes_to_courses[choice[0]].indexOf(course), 1);
+                        console.log("here2");
+                        classes_to_courses_temp[choice[0]].splice(classes_to_courses_temp[choice[0]].indexOf(course), 1);
+                        break;
+                    }
+                }
+            }
+            for (let course of proff_courses) {
+                console.log(course[0], choice[0]);
+                if (course[0] == choice[0]) {
+                    console.log("here213")
+                    console.log(course[1][1])
+                    if (course[1][1] == 0) {
+                        console.log("here23123 ", course)
+                        proff_courses.splice(proff_courses.indexOf(course), 1);
+                        break;
                     }
                 }
             }
@@ -603,14 +621,14 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
         if (locked_classes.includes(clas)) {
             continue;
         }
-        for (let course of classes_to_courses[clas]) {
+        for (let course of classes_to_courses_temp[clas]) {
             if (course[0] == course_code && course[3] == proff && course[2] == "T" && timetable_classes_ini[clas][day][slot] == "" && is_free_professor(timetable_professors_ini, proff, day, slot, clas)) {
                 timetable_classes_ini[clas][day][slot] = [course_code, proff]
                 timetable_professors_ini[proff][day][slot] = [course_code, clas]
                 initial_lectures.splice(initial_lectures.indexOf(lecture), 1);
                 course[1] -= 1
                 if (course[1] == 0) {
-                    classes_to_courses[clas].splice(classes_to_courses[clas].indexOf(course), 1);
+                    classes_to_courses_temp[clas].splice(classes_to_courses_temp[clas].indexOf(course), 1);
                 }
             }
         }
@@ -626,7 +644,7 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
             }
         }
     }
-    return [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year]
+    return [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year, classes_to_courses_temp]
 }
 
 function format_timetables(timetable_classes, timetable_professors, timetable_labs, proff_to_year, proff_to_short){
@@ -878,8 +896,12 @@ function get_replacements(classes_to_courses, timetable_professors){
 function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs) {
     // Initialises courses and timetables
     let classes_to_courses = initialise_class_courses(class_courses, locked_classes);
-    let [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year] = initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs);
+    let [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year, classes_to_courses_temp] = initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, initial_proffs);
 
+    classes_to_courses = JSON.parse(JSON.stringify(classes_to_courses_temp));
+    console.log(classes_to_courses_temp);
+    console.log(timetable_classes_ini);
+    
     let check = false;
     let fallback = 0;
 

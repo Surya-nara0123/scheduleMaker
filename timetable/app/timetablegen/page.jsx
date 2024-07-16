@@ -223,7 +223,7 @@ export default function Table() {
       [],
       {},
       {},
-      [['Mr.Prawin Raj', [2,3], [0,1,2,3,4,6,7]]]
+      [["Mr.Prawin Raj", [2,3], [0,1,2,3,4,6,7]]]
     );
     if (Object.keys(tables).length === 0) {
       alert(
