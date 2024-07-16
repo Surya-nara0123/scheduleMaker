@@ -549,16 +549,13 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
         }
     }
 
-    console.log(initial_proffs);
     for (let i of initial_proffs) {
         let proff = i[0];
         let days = i[1];
         let slots = i[2];
         let possible_slots = [];
         for (let day of days) {
-            console.log(day);
             for (let slot of slots) {
-                console.log(slot);
                 possible_slots.push([day, slot]);
             }
         }
@@ -570,7 +567,6 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
                 }
             }
         }
-        console.log(proff_courses);
         for (let period of possible_slots) {
             let possible = [];
             for (let classes of proff_courses) {
@@ -581,14 +577,11 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
             if (possible.length == 0) {
                 continue;
             }
-            console.log(possible);
             console.log("hello");
             let choice = possible[make_random() % possible.length];
-            console.log("lol")
             timetable_classes_ini[choice[0]][period[0]][period[1]] = [choice[1][0], proff];
-            console.log(timetable_classes_ini[choice[0]][period[0]][period[1]]);
             timetable_professors_ini[proff][period[0]][period[1]] = [choice[1][0], choice[0]];
-            for (course in classes_to_courses[choice[0]]) {
+            for (let course in classes_to_courses[choice[0]]) {
                 if (course[0] == choice[1][0]) {
                     course[1] -= 1;
                     if (course[1] == 0) {
@@ -613,7 +606,7 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
                 initial_lectures.splice(initial_lectures.indexOf(lecture), 1);
                 course[1] -= 1
                 if (course[1] == 0) {
-                    classes_to_courses[clas].splice(classes_to_courses.indexOf(course), 1);
+                    classes_to_courses[clas].splice(classes_to_courses[clas].indexOf(course), 1);
                 }
             }
         }
