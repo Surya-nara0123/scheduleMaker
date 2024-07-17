@@ -6,9 +6,7 @@ import { generatePDF } from "./print.jsx";
 import { randomize } from "./algo.jsx";
 import Papa from "papaparse";
 import PocketBase from "pocketbase";
-import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-
 
 const pb = new PocketBase("https://snuc.pockethost.io");
 
@@ -286,6 +284,32 @@ export default function Table() {
     saveAs(blob, classTitle + ".pdf");
   };
 
+  const genCSV = async (classTitle) => {
+    const timetable = timetableData[classTitle];
+    if (!timetable) {
+      alert(`No timetable found for ${classTitle}`);
+      return;
+    }
+  
+    const headers = Object.keys(timetable[0]);
+    let csv = classTitle + '\n';
+    csv += headers.join(",") + "\n";
+    
+    timetable.forEach(row => {
+      csv += Object.values(row).map(value => {
+        if (typeof value === 'string') {
+          value = value.replace(/"/g, '""');
+          if (value.search(/("|,|\n)/g) >= 0) value = `"${value}"`;
+        }
+        return value;
+      }).join(",") + "\n";
+    });
+  
+    const blob = new Blob([csv], { type: "text/csv" });
+    saveAs(blob, classTitle + ".csv");
+  };
+
+  
   const genPDFall = async () => {
     // let zip = new JSZip();
     // let count = 0;
@@ -781,7 +805,15 @@ export default function Table() {
                               genPDF(currentYear + " B_Tech " + currentSection);
                             }}
                           >
-                            Save
+                            Save as pdf
+                          </button>
+                          <button
+                            className="bg-green-500 p-3 rounded-lg mt-3 mr-2"
+                            onClick={() => {
+                              genCSV(currentYear + " B_Tech " + currentSection);
+                            }}
+                          >
+                            Save as csv
                           </button>
                         </div>
                       </div>
