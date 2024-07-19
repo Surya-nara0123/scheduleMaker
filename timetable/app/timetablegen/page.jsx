@@ -8,113 +8,111 @@ import Papa from "papaparse";
 import PocketBase from "pocketbase";
 import { saveAs } from 'file-saver';
 
-function format_timetables(timetable_classes, timetable_professors, timetable_labs, proff_to_year, proff_to_short){
-    for(let clas of Object.keys(timetable_classes)){
-        if(clas.slice(0,1) === "1"){
-            for(let day = 0; day < 5; day++){
-                timetable_classes[clas][day].splice(2, 0, "Break")
-                timetable_classes[clas][day].splice(8, 0, "Break")
-            }
+function format_timetables(timetable_classes, timetable_professors, timetable_labs, proff_to_year, proff_to_short) {
+  for (let clas of Object.keys(timetable_classes)) {
+    if (clas.slice(0, 1) === "1") {
+      for (let day = 0; day < 5; day++) {
+        timetable_classes[clas][day].splice(2, 0, "Break")
+        timetable_classes[clas][day].splice(8, 0, "Break")
+      }
+    } else {
+      for (let day = 0; day < 5; day++) {
+        timetable_classes[clas][day].splice(3, 0, "Break")
+        timetable_classes[clas][day].splice(8, 0, "Break")
+      }
+    }
+  }
+  for (let prof of Object.keys(timetable_professors)) {
+    if (proff_to_year[prof] === "1") {
+      for (let day = 0; day < 5; day++) {
+        timetable_professors[prof][day].splice(2, 0, "Break")
+        timetable_professors[prof][day].splice(8, 0, "Break")
+      }
+    } else if (proff_to_year[prof] === "2") {
+      for (let day = 0; day < 5; day++) {
+        timetable_professors[prof][day].splice(3, 0, "Break")
+        timetable_professors[prof][day].splice(8, 0, "Break")
+      }
+    } else {
+      for (let day = 0; day < 5; day++) {
+        if (timetable_professors[prof][day][2] === "") {
+          timetable_professors[prof][day].splice(2, 0, "Break")
+        } else if (timetable_professors[prof][day][2][1].slice(0, 1) === "1") {
+          timetable_professors[prof][day].splice(2, 0, "Break")
         } else {
-            for(let day = 0; day < 5; day++){
-                timetable_classes[clas][day].splice(3, 0, "Break")
-                timetable_classes[clas][day].splice(8, 0, "Break")
-            }
+          timetable_professors[prof][day].splice(3, 0, "Break")
         }
+        timetable_professors[prof][day].splice(8, 0, "Break")
+      }
     }
-    for(let prof of Object.keys(timetable_professors)){
-        if(proff_to_year[prof] === "1"){
-            for(let day = 0; day < 5; day++){
-                timetable_professors[prof][day].splice(2, 0, "Break")
-                timetable_professors[prof][day].splice(8, 0, "Break")
-            }
-        } else if(proff_to_year[prof] === "2") {
-            for(let day = 0; day < 5; day++){
-                timetable_professors[prof][day].splice(3, 0, "Break")
-                timetable_professors[prof][day].splice(8, 0, "Break")
-            }
+  }
+
+  for (let clas of Object.keys(timetable_classes)) {
+    for (let day = 0; day < 5; day++) {
+      for (let slot = 0; slot < timetable_classes[clas][day].length; slot++) {
+        if (typeof timetable_classes[clas][day][slot] === typeof "string") {
+          continue
         } else {
-            for(let day = 0; day < 5; day++){
-                if(timetable_professors[prof][day][2] === ""){
-                    timetable_professors[prof][day].splice(2, 0, "Break")
-                } else if (timetable_professors[prof][day][2][1].slice(0,1) === "1"){
-                    timetable_professors[prof][day].splice(2, 0, "Break")
-                } else {
-                    timetable_professors[prof][day].splice(3, 0, "Break")
-                }
-                timetable_professors[prof][day].splice(8, 0, "Break")
+          if (timetable_classes[clas][day][slot][0].includes("Self-Learning")) {
+            timetable_classes[clas][day][slot] = "Self-Learning"
+          } else {
+            let result = ""
+            for (let i of timetable_classes[clas][day][slot]) {
+              if (proff_to_short[i]) {
+                result += proff_to_short[i];
+              } else {
+                result += i;
+              }
+              result += " "
             }
+            timetable_classes[clas][day][slot] = result
+          }
         }
+      }
     }
+  }
 
-    for(let clas of Object.keys(timetable_classes)){
-        for(let day = 0; day < 5; day++){
-            for(let slot = 0; slot < timetable_classes[clas][day].length; slot++){
-                if(typeof timetable_classes[clas][day][slot] === typeof "string"){
-                    continue
-                } else {
-                    if(timetable_classes[clas][day][slot][0].includes("Self-Learning")){
-                        timetable_classes[clas][day][slot] = "Self-Learning"
-                    } else {
-                        let result = ""
-                        for(let i of timetable_classes[clas][day][slot]){
-                            if(proff_to_short[i]){
-                                result += proff_to_short[i];
-                            } else {
-                                result += i;
-                            }
-                            result += " "
-                        }
-                        timetable_classes[clas][day][slot] = result
-                    }
-                }
-            }
+  for (let prof of Object.keys(timetable_professors)) {
+    for (let day = 0; day < 5; day++) {
+      for (let slot = 0; slot < timetable_professors[prof][day].length; slot++) {
+        if (typeof timetable_professors[prof][day][slot] === typeof "string") {
+          continue
+        } else {
+          let result = ""
+          for (let i of timetable_professors[prof][day][slot]) {
+            result += i
+            result += " "
+          }
+          timetable_professors[prof][day][slot] = result
         }
+      }
     }
+  }
 
-    for(let prof of Object.keys(timetable_professors)){
-        for(let day = 0; day < 5; day++){
-            for(let slot = 0; slot < timetable_professors[prof][day].length; slot++){
-                if(typeof timetable_professors[prof][day][slot] === typeof "string"){
-                    continue
-                } else {
-                    let result = ""
-                    for(let i of timetable_professors[prof][day][slot]){
-                        result += i
-                        result += " "
-                    }
-                    timetable_professors[prof][day][slot] = result
-                }
-            }
+  for (let lab of Object.keys(timetable_labs)) {
+    for (let day = 0; day < 5; day++) {
+      for (let slot = 0; slot < timetable_labs[lab][day].length; slot++) {
+        if (typeof timetable_labs[lab][day][slot] === typeof "string") {
+          continue
+        } else {
+          let result = ""
+          for (let i of timetable_labs[lab][day][slot]) {
+            result += i
+            result += " "
+          }
+          timetable_labs[lab][day][slot] = result
         }
+      }
     }
-
-    for(let lab of Object.keys(timetable_labs)){
-        for(let day = 0; day < 5; day++){
-            for(let slot = 0; slot < timetable_labs[lab][day].length; slot++){
-                if(typeof timetable_labs[lab][day][slot] === typeof "string"){
-                    continue
-                } else {
-                    let result = ""
-                    for(let i of timetable_labs[lab][day][slot]){
-                        result += i
-                        result += " "
-                    }
-                    timetable_labs[lab][day][slot] = result
-                }
-            }
-        }
-    }
+  }
 }
-
-let fixed_classes = [];
-let timetable_classes = {};
-let timetable_professors = {};
-let timetable_labs = {};
 
 const pb = new PocketBase("https://snuc.pockethost.io");
 
 export default function Table() {
+  const [timetableClasses, setTimetableClasses] = useState({});
+  const [timetableProfessors, setTimetableProfessors] = useState({});
+  const [timetableLabs, setTimetableLabs] = useState({});
   const year1 = [
     "8.10-9.00",
     "9.00-9.50",
@@ -316,27 +314,42 @@ export default function Table() {
 
     //class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable is syntax
 
-    let tables = randomize(
-      class_courses,
+    console.log([class_courses,
       professors,
       proffs_names_to_short,
       labs,
       parameter,
-      fixed_classes,
-      timetable_professors,
-      timetable_classes,
-      timetable_labs,
-      [["Mr.Prawin Raj", [2,3], [0,1,2,3,4,6,7]]]
-    );
+      lockedClasses,
+      timetableProfessors,
+      timetableClasses,
+      timetableLabs]);
+    const response = await fetch("/api/timetableGenrator", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([class_courses,
+        professors,
+        proffs_names_to_short,
+        labs,
+        parameter,
+        lockedClasses,
+        timetableProfessors,
+        timetableClasses,
+        timetableLabs]),
+    })
+    const body = await response.json();
+    console.log(body);
+    const tables = body["result"];
     if (Object.keys(tables).length === 0) {
       alert(
         "Error in timetable generation!! Please contact the developer via the discord handle 'DrunkenCloud' or https://discord.gg/wwN64wD4 in this discord server.",
       );
       return;
     }
-    timetable_professors = JSON.parse(JSON.stringify(tables[0]));
-    timetable_classes = JSON.parse(JSON.stringify(tables[1]));
-    timetable_labs = JSON.parse(JSON.stringify(tables[3]));
+    await setTimetableProfessors(JSON.parse(JSON.stringify(tables[1])));
+    await setTimetableClasses(JSON.parse(JSON.stringify(tables[0])));
+    await setTimetableLabs(JSON.parse(JSON.stringify(tables[3])));
     format_timetables(tables[0], tables[1], tables[3], tables[4], proffs_names_to_short);
     let a = tables[0];
     let b = tables[1];
@@ -383,7 +396,7 @@ export default function Table() {
     // console.log(proffDetails);
     return proffDetails;
   };
-
+  
   const genPDF = async (classTitle) => {
     let temp = {};
     let a = await convertDetails(classTitle);
@@ -399,11 +412,11 @@ export default function Table() {
       alert(`No timetable found for ${classTitle}`);
       return;
     }
-  
+
     const headers = Object.keys(timetable[0]);
     let csv = classTitle + '\n';
     csv += headers.join(",") + "\n";
-    
+
     timetable.forEach(row => {
       csv += Object.values(row).map(value => {
         if (typeof value === 'string') {
@@ -413,12 +426,12 @@ export default function Table() {
         return value;
       }).join(",") + "\n";
     });
-  
+
     const blob = new Blob([csv], { type: "text/csv" });
     saveAs(blob, classTitle + ".csv");
   };
 
-  
+
   const genPDFall = async () => {
     // let zip = new JSZip();
     // let count = 0;
@@ -789,34 +802,24 @@ export default function Table() {
                             </div>
                           </div>
                           <div className="flex gap-1">
-                            {index <= 5
-                              ? year1.map((slot, index) => (
-                                <div
-                                  key={index}
-                                  className="md:w-24 md:h-16 flex items-center w-12 h-8 text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                                >
-                                  {slot}
-                                </div>
-                              ))
-                              : [
-                                "8.10-9.00",
-                                "9.00-9.50",
-                                "9.50-10.40",
-                                "break",
-                                "11.00-11.50",
-                                "11.50-12.40",
-                                "Lunch",
-                                "1.40-2.30",
-                                "break",
-                                "2.40-3.30",
-                              ].map((slot, index) => (
-                                <div
-                                  key={index}
-                                  className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
-                                >
-                                  {slot}
-                                </div>
-                              ))}
+                            {["8.10-9.00",
+                              "9.00-9.50",
+                              "9.50-10.40",
+                              "break",
+                              "11.00-11.50",
+                              "11.50-12.40",
+                              "Lunch",
+                              "1.40-2.30",
+                              "break",
+                              "2.40-3.30",
+                            ].map((slot, index) => (
+                              <div
+                                key={index}
+                                className="w-12 h-8 md:w-24 md:h-16 flex items-center text-[7px] md:text-sm justify-center bg-[#bfc0c0] rounded-lg "
+                              >
+                                {slot}
+                              </div>
+                            ))}
                           </div>
                         </div>
                         <div className="flex">
@@ -898,16 +901,33 @@ export default function Table() {
                           </div>
                         </div>
                         <div className="flex mt-4 ml-auto">
-                          <button
-                            className="bg-red-500 p-3 rounded-lg mt-3 mr-2"
-                            onClick={() => {
-                              setLockedClasses(
-                                () => [...lockedClasses, dataa],
-                              )
-                            }}
-                          >
-                            Fix
-                          </button>
+                          {!lockedClasses.includes(dataa) ?
+                            <button
+                              className="bg-red-500 p-3 rounded-lg mt-3 mr-2"
+                              onClick={() => {
+                                if (!lockedClasses.includes(dataa)) {
+                                  setLockedClasses(
+                                    () => [...lockedClasses, dataa],
+                                  )
+                                }
+                                console.log(lockedClasses);
+                              }}
+                            >
+                              Fix
+                            </button> :
+                            <button
+                              className="bg-green-500 p-3 rounded-lg mt-3 mr-2"
+                              onClick={() => {
+                                if (!lockedClasses.includes(dataa)) {
+                                  setLockedClasses(
+                                    () => [...lockedClasses, dataa],
+                                  )
+                                }
+                                console.log(lockedClasses);
+                              }}
+                            >
+                              Fixed
+                            </button>}
                           <button
                             className="bg-blue-500 p-3 rounded-lg mt-3 mr-2"
                             onClick={() => {
