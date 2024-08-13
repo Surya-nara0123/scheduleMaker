@@ -210,7 +210,7 @@ export default function Table() {
       //   }
       //   if(c2!=null && r2 != null){
       //     document.getElementById("slot"+c2+r2).style.backgroundColor = "#dfdfdf";
-      }
+      // }
     }
 };
   const createList_labs = (data) => {
