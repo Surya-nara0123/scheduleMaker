@@ -185,7 +185,34 @@ export default function Table() {
     }
     return dictionary;
   };
-
+  let slot_selected_1 = "";
+  let slot_selected_2 = "";
+  let select_slot = "";
+  const handleEdit = (select_slot, c, r) => {
+      if(slot_selected_1!=""){
+        slot_selected_2 = select_slot;
+        let c1 = c;
+        let r1 = r
+        document.getElementById("slot"+c+r).style.backgroundColor = "green";
+      }
+      else{
+        let c2 = c;
+        let r2 = r;
+        slot_selected_1 = select_slot;
+        document.getElementById("slot"+c+r).style.backgroundColor = "green";
+      }
+      console.log("slot-1 : ",slot_selected_1," slot-2 : ",slot_selected_2);
+      if(slot_selected_1!="" && slot_selected_2!=""){
+        slot_selected_1 = "";
+        slot_selected_2 = "";
+      // if(c1!=null && r1 != null){
+      //     document.getElementById("slot"+c1+r1).style.backgroundColor = "#dfdfdf";
+      //   }
+      //   if(c2!=null && r2 != null){
+      //     document.getElementById("slot"+c2+r2).style.backgroundColor = "#dfdfdf";
+      }
+    }
+};
   const createList_labs = (data) => {
     const labs = [];
     let check = true;
@@ -849,6 +876,8 @@ export default function Table() {
                                           colIndex
                                           ] != "Lunch" ? (
                                           <div
+                                          id={"slot"+rowIndex+colIndex}
+                                          onClick={()=>handleEdit(timetableData[dataa][rowIndex][colIndex], rowIndex, colIndex)}
                                             key={colIndex + rowIndex}
                                             className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
                                           >{timetableData[dataa][rowIndex][
@@ -901,6 +930,8 @@ export default function Table() {
                           </div>
                         </div>
                         <div className="flex mt-4 ml-auto">
+                        <button className="bg-blue-400 rounded-lg p-3 mt-3 mr-2"
+                        >Edit</button>
                           {!lockedClasses.includes(dataa) ?
                             <button
                               className="bg-red-500 p-3 rounded-lg mt-3 mr-2"
