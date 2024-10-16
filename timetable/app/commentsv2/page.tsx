@@ -10,10 +10,10 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState<string>("");
 
-  const [proffTimetable, setProffTimetable] = useState([]);
+  const [proffTimetable, setProffTimetable] = useState<{ [key: string]: any }>({});
   const [currentTab, setCurrentTab] = useState("Professor");
   const [classYear, setClassYear] = useState("");
-  const [timetableData, setTimetable] = useState([]);
+  const [timetableData, setTimetable] = useState<{ [key: string]: string[][] }>({});
   const [slot, setSlot] = useState(0);
   const year1 = [
     "8.10-9.00",
@@ -83,7 +83,7 @@ export default function Home() {
     }
   }, []);
 
-  const [proff, setProff] = useState({});
+  const [proff, setProff] = useState<{ [key: string]: any }>({});
 
   return (
     <main className="min-h-screen bg-[#B4D2E7] select-none">
@@ -258,8 +258,8 @@ export default function Home() {
                   <select
                     className="bg-white rounded-lg p-2"
                     onChange={(e) => {
-                      let temp = {};
-                      temp[e.target.value] = proffTimetable[e.target.value];
+                      let temp: { [key: string]: any } = {};
+                      temp[e.target.value as string] = proffTimetable[e.target.value as string];
                       console.log(temp);
                       setProff(temp);
                     }}
@@ -268,7 +268,7 @@ export default function Home() {
                     {Object.keys(proffTimetable)
                       .sort(
                         (a, b) =>
-                          a.replace("Proff", "") - b.replace("Proff", ""),
+                          parseInt(a.replace("Proff", "")) - parseInt(b.replace("Proff", "")),
                       )
                       .map((key, index) => (
                         <option key={index}>{key}</option>
