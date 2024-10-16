@@ -250,7 +250,7 @@ export default function Home() {
                 <div className="flex flex-col gap-8 ml-12 mt-8">
                   <button
                     className="border rounded-lg py-1"
-                    onClick={handleModal}
+                    onClick={() => handleModal("", 0, 0, "")}
                   >
                     Testing
                   </button>

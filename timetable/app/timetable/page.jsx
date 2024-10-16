@@ -26,7 +26,12 @@ export default function Home() {
 
   const fetchTimetable = async () => {
     try {
-      const record = await pb.collection("timetable").getFullList();
+      const response = await fetch("/api/timetableGenrator", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+    })
       console.log(record[0].timetable[classYear]);
       setTimetable(record[0].timetable);
       setProffTimetable(record[1].timetable);
