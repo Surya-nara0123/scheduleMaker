@@ -477,7 +477,7 @@ function initialise_timetables(classes_to_courses: coursesDetails, professors: s
         if(locked_classes.includes(clas)) {
             continue;
         }
-        timetable_classes_ini[clas] = Array(5).fill(null).map(() => Array(8).fill("") as [string | string[]]);
+        timetable_classes_ini[clas] = Array(5).fill(null).map(() => Array(9).fill("") as [string | string[]]);
     }
 
     // Adds the classes of locked classes
@@ -510,20 +510,33 @@ function initialise_timetables(classes_to_courses: coursesDetails, professors: s
 
     //Adds lunch periods
     for (let clas of Object.keys(timetable_classes_ini)) {
-        if (clas.slice(0, 1) === "1") {
-            for (let day = 0; day < timetable_classes_ini[clas].length; day++) {
-                if (timetable_classes_ini[clas][day].length > 4 && timetable_classes_ini[clas][day][4]){
-                    timetable_classes_ini[clas][day][4] = "Lunch"
-                } 
-            }
-        } else {
-            for (let day = 0; day < timetable_classes_ini[clas].length; day++) {
-                if (timetable_classes_ini[clas][day].length >= 5){
-                    timetable_classes_ini[clas][day][5] = "Lunch"
+        for (let day = 0; day < timetable_classes_ini[clas].length; day++) {
+            const daySchedule = timetable_classes_ini[clas][day];
+    
+            // Check if it's an array (of string[] type) at the day schedule
+            if (Array.isArray(daySchedule)) {
+                if (clas.slice(0, 1) === "1") {
+                    // Ensure the array has at least 5 elements before assigning "Lunch"
+                    if (daySchedule.length < 5) {
+                        daySchedule.push(...Array(5 - daySchedule.length).fill("")); // Padding with empty strings
+                    }
+                    daySchedule[4] = "Lunch";  // Safely assigning "Lunch"
+                } else {
+                    // Ensure the array has at least 6 elements before assigning "Lunch"
+                    if (daySchedule.length < 6) {
+                        daySchedule.push(...Array(6 - daySchedule.length).fill("")); // Padding with empty strings
+                    }
+                    daySchedule[5] = "Lunch";  // Safely assigning "Lunch"
                 }
+            } else {
+                // Handle the case where it's just a single string, if needed
+                console.log(`Day schedule for ${clas} is not an array:`, daySchedule);
             }
         }
     }
+    
+    
+    
 
     for (let proff of Object.keys(proff_to_year)) {
         if(proff.includes("self")){
