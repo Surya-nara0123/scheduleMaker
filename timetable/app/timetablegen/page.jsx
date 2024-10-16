@@ -8,7 +8,12 @@ import Papa from "papaparse";
 import PocketBase from "pocketbase";
 import { saveAs } from 'file-saver';
 
-function format_timetables(timetable_classes, timetable_professors, timetable_labs, proff_to_year, proff_to_short) {
+let classSwaps = [];
+
+function format_timetables(timetable_classes_, timetable_professors_, timetable_labs_, proff_to_year, proff_to_short) {
+  let timetable_classes = JSON.parse(JSON.stringify(timetable_classes_));
+  let timetable_professors = JSON.parse(JSON.stringify(timetable_professors_));
+  let timetable_labs = JSON.parse(JSON.stringify(timetable_labs_));
   for (let clas of Object.keys(timetable_classes)) {
     if (clas.slice(0, 1) === "1") {
       for (let day = 0; day < 5; day++) {
@@ -58,7 +63,7 @@ function format_timetables(timetable_classes, timetable_professors, timetable_la
           } else {
             let result = ""
             for (let i of timetable_classes[clas][day][slot]) {
-              if (proff_to_short[i]) {
+              if (i in proff_to_short) {
                 result += proff_to_short[i];
               } else {
                 result += i;
@@ -105,6 +110,32 @@ function format_timetables(timetable_classes, timetable_professors, timetable_la
       }
     }
   }
+
+  return [timetable_classes, timetable_professors, timetable_labs]
+}
+
+function isSwappable(timetable_classes, timetable_professors, clas, day1, slot1, day2, slot2) {
+  console.log(timetable_classes[clas][day1][slot1]);
+  console.log(timetable_classes[clas][day2][slot2]);
+  return ((is_free_professor(timetable_professors, timetable_classes[clas][day1][slot1][1], day2, slot2, clas)) && (is_free_professor(timetable_professors, timetable_classes[clas][day2][slot2][1], day1, slot1, clas)))
+}
+
+function is_free_professor(timetable_professors, proff, day, slot, clas) {
+  if (timetable_professors[proff][day][slot] === "") {
+      let clas_count = 0
+      let period_count = 0;
+      for (let i = 0; i < slot; i++) {
+          if (typeof timetable_professors[proff][day][i] === typeof "Lunch") {
+              continue;
+          }
+          if (timetable_professors[proff][day][i][1] === clas) {
+              clas_count += 1;
+          }
+          period_count += 1;
+      }
+      return clas_count < 3 && period_count < 6;
+  }
+  return false
 }
 
 const pb = new PocketBase("https://snuc.pockethost.io");
@@ -130,6 +161,7 @@ export default function Table() {
   const [isGenerated, setIsGenerated] = useState(false);
 
   const [timetableData, setTimetableData] = useState([]);
+  const [timetablesForUsing, setAllTimetables] = useState([[], [], [], []]);
   const [file1, setFile1] = useState(null);
   const [file2, setFile2] = useState(null);
   const [file3, setFile3] = useState(null);
@@ -185,7 +217,55 @@ export default function Table() {
     }
     return dictionary;
   };
-
+  const handleEdit = (clas, c, r) => {
+    document.getElementById("messages").innerHTML = ``;
+    let tr = r;
+    console.log(r);
+    if (clas[0] != "1") {
+      if (r > 2 && r < 6) {
+        tr -= 1;
+      } else if (r == 7) {
+        tr = 6;
+      } else if (r == 9) {
+        tr = 7;
+      }
+    }
+    for (let content of classSwaps) {
+      if (content[0] != clas) {
+        classSwaps = [];
+        break;
+      }
+      if (content[0] == clas && content[1] == c && content[2] == tr) {
+        document.getElementById("slot"+c+r).style.backgroundColor = "#dfdfdf";
+        classSwaps.splice(classSwaps.indexOf(content), 1);
+        return;
+      }
+    }
+    if (timetablesForUsing[0][clas][c][tr].length > 2) {
+      console.log(timetablesForUsing[0][clas][c][tr]);
+      return;
+    }
+    console.log(timetablesForUsing[0][clas][c][tr]);
+    console.log(clas, c, tr);
+    if (classSwaps.length >= 2) {
+      console.log(classSwaps);
+      while (classSwaps.length >= 2) {
+        let idkr = classSwaps[0][2];
+        if (idkr >=3 && idkr <=5) {
+          idkr += 1;
+        } else if (idkr == 6) {
+          idkr = 7;
+        } else if (idkr == 7) {
+          idkr = 9;
+        }
+        document.getElementById("slot"+classSwaps[0][1]+idkr).style.backgroundColor = "#dfdfdf";
+        classSwaps = classSwaps.slice(1);
+      }
+    }
+    document.getElementById("slot"+c+r).style.backgroundColor = "pink";
+    classSwaps.push([clas, c, tr]);
+    console.log(classSwaps);
+};
   const createList_labs = (data) => {
     const labs = [];
     let check = true;
@@ -350,9 +430,7 @@ export default function Table() {
     await setTimetableProfessors(JSON.parse(JSON.stringify(tables[1])));
     await setTimetableClasses(JSON.parse(JSON.stringify(tables[0])));
     await setTimetableLabs(JSON.parse(JSON.stringify(tables[3])));
-    format_timetables(tables[0], tables[1], tables[3], tables[4], proffs_names_to_short);
-    let a = tables[0];
-    let b = tables[1];
+    let [a, b, c] = format_timetables(tables[0], tables[1], tables[3], tables[4], proffs_names_to_short);
     setTable(a);
 
     console.log("a: ", a);
@@ -360,6 +438,7 @@ export default function Table() {
 
     setProfData(b);
     setTimetableData(a);
+    setAllTimetables([tables[0], tables[1], tables[3], tables[4], proffs_names_to_short]);
 
     setIsGenerated(true);
   };
@@ -393,7 +472,6 @@ export default function Table() {
       ];
       proffDetails.push(temp);
     }
-    // console.log(proffDetails);
     return proffDetails;
   };
   
@@ -433,23 +511,6 @@ export default function Table() {
 
 
   const genPDFall = async () => {
-    // let zip = new JSZip();
-    // let count = 0;
-    // for (let key in timetableData) {
-    //   let temp = {};
-    //   let a = convertDetails(key);
-    //   temp[key] = timetableData[key];
-    //   let pdf = await generatePDF(temp, a);
-    //   zip.file(key + ".pdf", pdf);
-    //   count++;
-    // }
-    // if (count == 0) {
-    //   alert("No Timetables to save");
-    //   return;
-    // }
-    // zip.generateAsync({ type: "blob" }).then(function (content) {
-    //   saveAs(content, "Timetables.zip");
-    // });
     function jsonToCsv(jsonObj) {
       // Extract headers
       const headers = Object.keys(jsonObj[Object.keys(jsonObj)[0]][0]);
@@ -520,15 +581,175 @@ export default function Table() {
     } catch (error) {
       console.error('Error updating timetable:', error);
     }
+  };
 
+  const swapClasses = async() => {
+    if (classSwaps.length != 2) {
+        return;
+    }
 
-    // const record1 = await pb
-    //   .collection("timetable")
-    //   .update("gmivv6jb0cqo2m5", data1);
+    let class1 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]]))
+    let class2 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[1][0]][classSwaps[1][1]][classSwaps[1][2]]))
 
-    // const record = await pb
-    //   .collection("timetable")
-    //   .update("wizw6h9iga918ub", data);
+    console.log(class1, class2);
+
+    if (class1[0].includes("Self") && class2[0].includes("Self")) {
+      document.getElementById("messages").innerHTML = `Not Funny Bro :)`;
+      return;
+    }
+
+    if (class1[0].includes("Self")) {
+      if (is_free_professor(
+          timetablesForUsing[1],
+          timetablesForUsing[0][classSwaps[1][0]][classSwaps[1][1]][classSwaps[1][2]][1], 
+          classSwaps[0][1],
+          classSwaps[0][2],
+          classSwaps[0][0]
+      )) {
+          let proff1 = JSON.parse(JSON.stringify(class2[1]));
+          let temp1 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[1][0]][classSwaps[1][1]][classSwaps[1][2]]));
+          
+          timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]] = temp1;
+          timetablesForUsing[0][classSwaps[1][0]][classSwaps[1][1]][classSwaps[1][2]] = ["Self-Learning", "self_proff"];
+
+          timetablesForUsing[1][proff1][classSwaps[0][1]][classSwaps[0][2]] = [temp1[0], classSwaps[1][0]];
+          timetablesForUsing[1][proff1][classSwaps[1][1]][classSwaps[1][2]] = "";
+
+          let [a, b, c] = format_timetables(
+              timetablesForUsing[0], 
+              timetablesForUsing[1], 
+              timetablesForUsing[2], 
+              timetablesForUsing[3], 
+              timetablesForUsing[4]
+          );
+          setTable(a);
+          setProfData(b);
+          setTimetableData(a);
+          setAllTimetables([
+              timetablesForUsing[0], 
+              timetablesForUsing[1], 
+              timetablesForUsing[2], 
+              timetablesForUsing[3], 
+              timetablesForUsing[4]
+          ]);
+          setIsGenerated(true);
+      } else {
+          let busyClass = JSON.parse(JSON.stringify(timetablesForUsing[1][timetablesForUsing[0][classSwaps[1][0]][classSwaps[1][1]][classSwaps[1][2]][1]][classSwaps[0][1]][classSwaps[0][2]]));
+          console.log(busyClass);
+          document.getElementById("messages").innerHTML = `Professor is busy with ${busyClass[0]} for ${busyClass[1]} at the selected time.`;
+      }
+      return;
+    }
+
+    if (class2[0].includes("Self")) {
+      if (is_free_professor(
+          timetablesForUsing[1], 
+          timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]][1], 
+          classSwaps[1][1],
+          classSwaps[1][2], 
+          classSwaps[1][0]
+      )) {
+          let proff2 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]][1]));
+          let temp2 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]]));
+
+          timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]] = ["Self-Learning", "self_proff"];
+          timetablesForUsing[0][classSwaps[1][0]][classSwaps[1][1]][classSwaps[1][2]] = temp2;
+
+          timetablesForUsing[1][proff2][classSwaps[0][1]][classSwaps[0][2]] = "";
+          timetablesForUsing[1][proff2][classSwaps[1][1]][classSwaps[1][2]] = [temp2[0], classSwaps[0][0]];
+
+          let [a, b, c] = format_timetables(
+              timetablesForUsing[0], 
+              timetablesForUsing[1], 
+              timetablesForUsing[2], 
+              timetablesForUsing[3], 
+              timetablesForUsing[4]
+          );
+          setTable(a);
+          setProfData(b);
+          setTimetableData(a);
+          setAllTimetables([
+              timetablesForUsing[0], 
+              timetablesForUsing[1], 
+              timetablesForUsing[2], 
+              timetablesForUsing[3], 
+              timetablesForUsing[4]
+          ]);
+          setIsGenerated(true);
+      } else {
+          let busyClass = JSON.parse(JSON.stringify(timetablesForUsing[1][timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]][1]][classSwaps[0][1]][classSwaps[0][2]]));
+          console.log(busyClass);
+          document.getElementById("messages").innerHTML = `Professor is busy with ${busyClass[0]} for ${busyClass[1]} at the selected time.`;
+      }
+      return;
+    }
+
+    if (isSwappable(
+      timetablesForUsing[0], 
+      timetablesForUsing[1], 
+      classSwaps[0][0], 
+      classSwaps[0][1],
+      classSwaps[0][2], 
+      classSwaps[1][1], 
+      classSwaps[1][2]
+    )) {
+      let proff1 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[0][0]][classSwaps[1][1]][classSwaps[1][2]][1]));
+      let proff2 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]][1]));
+      let temp1 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[0][0]][classSwaps[1][1]][classSwaps[1][2]]));
+      let temp2 = JSON.parse(JSON.stringify(timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]]));
+
+      console.log(temp1);
+      console.log(temp2);
+      console.log(proff1);
+      console.log(proff2);
+
+      timetablesForUsing[0][classSwaps[0][0]][classSwaps[1][1]][classSwaps[1][2]] = temp2;
+      timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]] = temp1;
+
+      timetablesForUsing[1][proff1][classSwaps[0][1]][classSwaps[0][2]] = [temp1[0], classSwaps[0][0]];
+      timetablesForUsing[1][proff2][classSwaps[0][1]][classSwaps[0][2]] = "";
+      timetablesForUsing[1][proff1][classSwaps[1][1]][classSwaps[1][2]] = "";
+      timetablesForUsing[1][proff2][classSwaps[1][1]][classSwaps[1][2]] = [temp2[0], classSwaps[0][0]];
+
+      let [a, b, c] = format_timetables(
+          timetablesForUsing[0], 
+          timetablesForUsing[1], 
+          timetablesForUsing[2], 
+          timetablesForUsing[3], 
+          timetablesForUsing[4]
+      );
+      setTable(a);
+      setProfData(b);
+      setTimetableData(a);
+      setAllTimetables([
+          timetablesForUsing[0], 
+          timetablesForUsing[1], 
+          timetablesForUsing[2], 
+          timetablesForUsing[3], 
+          timetablesForUsing[4]
+      ]);
+      console.log(timetablesForUsing);
+      console.log(a);
+      console.log(b);
+
+      setIsGenerated(true);
+    } else {
+      let busyProf1 = timetablesForUsing[0][classSwaps[0][0]][classSwaps[0][1]][classSwaps[0][2]][1];
+      let busyProf2 = timetablesForUsing[0][classSwaps[1][0]][classSwaps[1][1]][classSwaps[1][2]][1];
+      
+      let busyClass1 = timetablesForUsing[1][busyProf1][classSwaps[1][1]][classSwaps[1][2]];
+      let busyClass2 = timetablesForUsing[1][busyProf2][classSwaps[0][1]][classSwaps[0][2]];
+      
+      if (busyClass1 == "" && busyClass2 != "") {
+      } else if (busyClass1 != "" && busyClass2 == "") {
+          document.getElementById("messages").innerHTML = `Professor ${busyProf1} is busy with ${busyClass1[0]} for ${busyClass1[1]} at the selected time.`;
+      } else if (busyClass1 != "" && busyClass2 != "") {
+          document.getElementById("messages").innerHTML = `Professor ${busyProf1} is busy with ${busyClass1[0]} for ${busyClass1[1]} and Professor ${busyProf2} is busy with ${busyClass2[0]} for ${busyClass2[1]} at the selected times.`;
+      } else {
+          document.getElementById("messages").innerHTML = "Error Found!! Please contact maintainer DrunkenCloud on discord";
+      }
+  }
+  
   };
 
   const [isLoggedin, setLoggedin] = useState(false);
@@ -635,6 +856,15 @@ export default function Table() {
                 >
                   Push to DB
                 </button>
+                <button
+                  className="bg-purple-500 justify-center items-center rounded-lg p-2 ml-2"
+                  onClick={() => {
+                    swapClasses();
+                  }}
+                >
+                  Swap Classes
+                </button>
+                <div id="messages" className="flex ml-20 font-bold font-mono text-3xl pt-2 text-red-500"></div>
               </div>
             </div>
 
@@ -849,6 +1079,8 @@ export default function Table() {
                                           colIndex
                                           ] != "Lunch" ? (
                                           <div
+                                          id={"slot"+rowIndex+colIndex}
+                                          onClick={()=>handleEdit(dataa, rowIndex, colIndex)}
                                             key={colIndex + rowIndex}
                                             className="w-12 h-8 md:w-24 md:h-16 bg-[#dfdfdf] rounded-lg justfiy-center items-center flex text-center text-[5px] md:text-[10px] overflow-auto"
                                           >{timetableData[dataa][rowIndex][
@@ -901,6 +1133,8 @@ export default function Table() {
                           </div>
                         </div>
                         <div className="flex mt-4 ml-auto">
+                        <button className="bg-blue-400 rounded-lg p-3 mt-3 mr-2"
+                        >Edit</button>
                           {!lockedClasses.includes(dataa) ?
                             <button
                               className="bg-red-500 p-3 rounded-lg mt-3 mr-2"
