@@ -1,5 +1,7 @@
 // Makes a random number
 
+import { init } from "next/dist/compiled/webpack/webpack";
+
 Math.seedrandom = function (seed) {
     return function () {
         let x = Math.sin(seed++) * 10000;
@@ -481,6 +483,7 @@ function initialise_class_courses(class_courses, locked_classes) {
 
 // its in the name
 function initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, labs_initial_timetable, initial_proffs) {
+    console.log(initial_lectures)
     let timetable_classes_ini = {}
     let timetable_professors_ini = {}
     let timetable_labs_ini = {}
@@ -630,25 +633,52 @@ function initialise_timetables(classes_to_courses, professors, labs, initial_lec
             }
         }
     }
-
-    let temp = JSON.parse(JSON.stringify(initial_lectures))
-
+    // let temp = JSON.stringify(initial_lectures)
+    // conver initial_lectures to a list of lists
+    let temp = JSON.parse(initial_lectures)
+    // console.log("Initial Lectures", typeof temp);
     for (let lecture of temp) {
-        let clas, course_code, proff, day, slot = lecture;
+        console.log(lecture)
+        // let clas, course_code, proff, day, slot = lecture;
+        let clas = lecture[0];
+        let course_code = lecture[1];
+        let proff = lecture[2];
+        let day = lecture[3];
+        let slot = lecture[4];
+        // console.log(clas, course_code, proff, day, slot)
+        // console.log(classes_to_courses_temp[clas])
         if (locked_classes.includes(clas)) {
             continue;
         }
         for (let course of classes_to_courses_temp[clas]) {
+            // console.log(course, lecture)
+            // consider edge case of self learning
+            // if (course[0] == 'Self-Learning 8' && course_code == 'Self-Learning') {
+            //     if (timetable_classes_ini[clas][day][slot] == "") {
+            //         // console.log(typeof(classes_to_courses_temp[clas]))
+            //         timetable_classes_ini[clas][day][slot] = ["Self-Learning 8", "self_proff"]
+            //         // timetable_professors_ini["self_proff"][day][slot] = ["Self-Learning 8", clas]
+            //         // console.log("Course")
+            //         temp.splice(temp.indexOf(lecture), 1);
+            //         // initial_lectures = JSON.stringify(temp);
+            //         course[1] -= 1
+            //         if (course[1] == 0) {
+            //             classes_to_courses_temp[clas].splice(classes_to_courses_temp[clas].indexOf(course), 1);
+            //         }
+            //     }
+            // }
             if (course[0] == course_code && course[3] == proff && course[2] == "T" && timetable_classes_ini[clas][day][slot] == "" && is_free_professor(timetable_professors_ini, proff, day, slot, clas)) {
                 timetable_classes_ini[clas][day][slot] = [course_code, proff]
                 timetable_professors_ini[proff][day][slot] = [course_code, clas]
-                initial_lectures.splice(initial_lectures.indexOf(lecture), 1);
+                // console.log("Course", temp)
+                temp.splice(temp.indexOf(lecture), 1);
                 course[1] -= 1
                 if (course[1] == 0) {
                     classes_to_courses_temp[clas].splice(classes_to_courses_temp[clas].indexOf(course), 1);
                 }
             }
         }
+        // console.log("Initial Lectures123", initial_lectures);
     }
     return [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year, classes_to_courses_temp]
 }
@@ -803,6 +833,7 @@ function get_replacements(classes_to_courses, timetable_professors, locked_class
 
 function get_timetables(class_courses, professors, proff_to_short, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, labs_initial_timetable, initial_proffs) {
     // Initialises courses and timetables
+    console.log("Initialising", initial_lectures);
     let [classes_to_courses, original] = initialise_class_courses(class_courses, locked_classes);
     let [timetable_classes_ini, timetable_professors_ini, timetable_labs_ini, proff_to_year, classes_to_courses_temp] = initialise_timetables(classes_to_courses, professors, labs, initial_lectures, locked_classes, proffs_initial_timetable, classes_initial_timetable, labs_initial_timetable, initial_proffs);
 

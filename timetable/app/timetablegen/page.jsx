@@ -202,6 +202,7 @@ export default function Table() {
   const [parameter, setParameter] = useState([]);
 
   const handleParameterChange = (e) => {
+    // console.log(e.target.value);
     setParameter(e.target.value);
   };
 
@@ -998,13 +999,9 @@ export default function Table() {
                   id="parameter"
                   placeholder="Parameters"
                   className="p-2 rounded-lg font-mono"
+                  value={parameter}
+                  onChange={handleParameterChange}
                 ></input>
-                <button
-                  className="rounded-lg border p-2 ml-4 text-white font-mono"
-                  onClick={handleParameterChange}
-                >
-                  Save Parameter
-                </button>
               </div>
               <div className="bg-white h-[3px] w-[800px] mt-1 mb-2"></div>
               <div className="flex">
